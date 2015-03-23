@@ -14,3 +14,6 @@ Follow the instructions in the `INSTALL` file provided in the root directory of 
     + GSI: Paul Foster <pfost@umich.edu>
     + GSI: Collin Johnson <collinej@umich.edu>
 
+# EECS467PACMAN
+Mobile Maebot PAC-MAN game.
+
