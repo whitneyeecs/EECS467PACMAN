@@ -26,7 +26,7 @@ CFLAGS_SHARED = -g -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_REENTRANT \
 
 CFLAGS_STD   := -std=gnu99 -Wno-format-zero-length $(CFLAGS_SHARED)
 CXXFLAGS_STD := -std=c++0x $(CFLAGS_SHARED)
-LDFLAGS_STD  := -lm -lpthread
+LDFLAGS_STD  := -lm -lpthread 
 
 CC           := gcc
 CXX          := g++
@@ -145,6 +145,10 @@ LDFLAGS_COMMON := -L$(LIB_PATH) -lcommon $(LDFLAGS_STD)
 CFLAGS_MAPPING  := -I$(SRC_PATH) $(CFLAGS_STD)
 LDFLAGS_MAPPING := -L$(LIB_PATH) -lmapping $(LDFLAGS_STD)
 
+# a3
+CFLAGS_A3 := -I$(SRC_PATH) $(CFLAGS_COMMON)
+LDFLAGS_A3 := -L$(LIB_PATH) -la3 $(LDFLAGS_STD) $(LDFLAGS_COMMON)
+
 # math
 CFLAGS_MATH  := -I$(SRC_PATH) $(CFLAGS_COMMON)
 LDFLAGS_MATH := -L$(LIB_PATH) -lmath $(LDFLAGS_COMMON)
@@ -173,6 +177,7 @@ LDFLAGS_VX_GTK := -L$(LIB_PATH) -lvxgtk $(LDFLAGS_VX_GL) $(LDFLAGS_VX) -lz
 CFLAGS_EECS467  := -I$(SRC_PATH) $(CFLAGS_VX_GTK) $(CFLAGS_IMAGESOURCE) $(CFLAGS_MATH) $(CFLAGS_COMMON)
 LDFLAGS_EECS467 := -L$(LIB_PATH) -leecs467 $(LDFLAGS_VX_GTK) $(LDFLAGS_IMAGESOURCE) $(LDFLAGS_MATH) $(LDFLAGS_COMMON) $(LDFLAGS_STD)
 
+
 ############################################################
 #
 # Build rules
@@ -186,6 +191,10 @@ LDFLAGS_EECS467 := -L$(LIB_PATH) -leecs467 $(LDFLAGS_VX_GTK) $(LDFLAGS_IMAGESOUR
 %.o: %.c
 	@echo "    $@"
 	@$(CC) $(CFLAGS) -c $<
+
+%.o: %.cpp %.hpp
+	@echo "    $@"
+	@$(CXX) $(CXXFLAGS) -c $<
 
 %.o: %.cpp
 	@echo "    $@"

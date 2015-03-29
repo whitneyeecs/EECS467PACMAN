@@ -7,6 +7,7 @@ CFLAGS = $(CFLAGS_STD) \
 	 $(CFLAGS_MATH) \
 	 $(CFLAGS_COMMON) \
 	 $(CFLAGS_LCMTYPES) \
+	 $(CFLAGS_A3) \
 	 -O2
 
 LDFLAGS = $(LDFLAGS_STD) \
@@ -14,7 +15,18 @@ LDFLAGS = $(LDFLAGS_STD) \
 	  $(LDFLAGS_IMAGESOURCE) \
 	  $(LDFLAGS_MATH) \
 	  $(LDFLAGS_COMMON) \
-	  $(LDFLAGS_LCMTYPES)
+	  $(LDFLAGS_LCMTYPES)\
+	  $(LDFLAGS_A3)
+
+CXXFLAGS =$(CXXFLAGS_STD) \
+	 $(CFLAGS_VX_GTK) \
+         $(CFLAGS_IMAGESOURCE) \
+	 $(CFLAGS_MATH) \
+	 $(CFLAGS_COMMON) \
+	 $(CFLAGS_A3) \
+	 $(CFLAGS_LCMTYPES) \
+	 -O2
+
 
 LIBDEPS = $(call libdeps, $(LDFLAGS))
 
@@ -25,9 +37,11 @@ BIN_EECS467_GUI_EXAMPLE = $(BIN_PATH)/eecs467_gui_example
 BIN_EECS467_REXARM_EXAMPLE = $(BIN_PATH)/eecs467_rexarm_example
 BIN_EECS467_MAEBOT_EXAMPLE = $(BIN_PATH)/eecs467_maebot_example
 BIN_EECS467_MAEBOT_VIDEO_TELOP = $(BIN_PATH)/eecs467_maebot_video_telop
+BIN_PACMAN = $(BIN_PATH)/pacman
 
 ALL = $(LIB_EECS467) $(BIN_EECS467_GUI_EXAMPLE) $(BIN_EECS467_REXARM_EXAMPLE) \
-      $(BIN_EECS467_MAEBOT_EXAMPLE) $(BIN_EECS467_MAEBOT_VIDEO_TELOP)
+      $(BIN_EECS467_MAEBOT_EXAMPLE) $(BIN_EECS467_MAEBOT_VIDEO_TELOP) \
+	  $(BIN_PACMAN)	
 
 all: $(ALL)
 
@@ -50,6 +64,11 @@ $(BIN_EECS467_MAEBOT_EXAMPLE): maebot_example.o $(LIBDEPS)
 $(BIN_EECS467_MAEBOT_VIDEO_TELOP): maebot_video_teleop.o $(LIBDEPS)
 	@echo "\t$@"
 	@$(CC) -o $@ $^ $(LDFLAGS)
+
+$(BIN_PACMAN): pacman.o $(LIB_EECS467) $(LIBDEPS)
+	@echo "\t$@"
+	@$(CXX) -o $@ $^ $(LDFLAGS) $(LIB_EECS467)
+
 
 clean:
 	@rm -f *.o *~ *.a
