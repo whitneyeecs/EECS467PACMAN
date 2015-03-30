@@ -56,7 +56,6 @@ struct state {
     pthread_mutex_t mutex;
 };
 
-
 static int
 key_event (vx_event_handler_t *vxeh, vx_layer_t *vl, vx_key_event_t* key)
 {
@@ -66,6 +65,7 @@ key_event (vx_event_handler_t *vxeh, vx_layer_t *vl, vx_key_event_t* key)
 		if(key->key_code == VX_KEY_UP){
 std::cout << "PRESSED UP" << std::endl;
 			state->nav->go(UP);
+std::cout <<"GOT OUT OF IT" << std::endl;
 		}else if(key->key_code == VX_KEY_DOWN){
 			state->nav->go(DOWN);
 std::cout << "PRESSED DOWN" << std::endl;
@@ -112,7 +112,7 @@ animate_thread (void *data)
     // when the window is closed/Ctrl+C is received.
     while (state->running) {
 		//ready to mask
-
+break;
 	//draw the image
 	vx_object_t *vim = vxo_image_from_u32(&state->image,
                VXO_IMAGE_FLIPY, VX_TEX_MIN_FILTER | VX_TEX_MAG_FILTER);
@@ -223,7 +223,6 @@ main (int argc, char *argv[])
 		exit (EXIT_FAILURE);
     }
 
-    //either take a pic with camera or load one from file
 	state->image = *(image_u32_create_from_pnm("data/pac-man.ppm"));
 	
     // list option

@@ -29,6 +29,9 @@ void Navigation::handle_feedback(const lcm::ReceiveBuffer* rbuf,
 	pthread_mutex_lock(&mutex);
 	odo = *msg;
 	pthread_mutex_unlock(&mutex);
+std::cout << "\nGot Motor Feedback" << std::endl;
+std::cout << "left odo: " << msg->encoder_left_ticks
+	<< "\nright odo: " << msg->encoder_right_ticks << std::endl;
 	return;
 }
                                
@@ -48,16 +51,17 @@ void Navigation::publish(){
 	pthread_mutex_lock(&mutex);
 	lcm.publish("MAEBOT_MOTOR_COMMAND", &cmd);
 	pthread_mutex_unlock(&mutex);
+
+	lcm.handle();
+
 	return;
 }
 
 void Navigation::go(float dir){
 	float cur_dir = 0.0;
-
 	pthread_mutex_lock(&mutex);
 	cur_dir = pose[2];
 	pthread_mutex_unlock(&mutex);
-	
 	if(dir != cur_dir){
 		turn(dir - cur_dir, dir);	
 	}
@@ -87,7 +91,10 @@ void Navigation::turn(float angle, float end_dir){
 	left_start = left_cur = odo.encoder_left_ticks;
 	right_start = right_cur = odo.encoder_right_ticks;
 	pthread_mutex_unlock(&mutex);
-
+std::cout << "left start: " << left_start
+	<< "\nleft cur: " << left_cur
+	<< "\nright start: " <<right_start
+	<< "\nright cur: " << right_cur << std::endl;
 	float arc_len = CIRC * (angle / (2 * M_PI));
 	int32_t delta_ticks = arc_len / METERS_PER_TICK;
 	delta_ticks = abs(delta_ticks);
@@ -105,7 +112,7 @@ void Navigation::turn(float angle, float end_dir){
 	cmd.motor_right_speed = GO * TURN_SCALE * sign;
 	cmd.utime = utime_now();
 	pthread_mutex_unlock(&mutex);
-	
+std::cout << "arc lenght: " << arc_len << "\ndelta ticks: " << delta_ticks <<std::endl;	
 	int hz = 20;
 	while(abs(right_cur - right_start) < delta_ticks && 
 			abs(left_cur - left_start) < delta_ticks){
@@ -113,6 +120,9 @@ void Navigation::turn(float angle, float end_dir){
 		left_cur = odo.encoder_left_ticks;
 		right_cur = odo.encoder_right_ticks;
 		pthread_mutex_unlock(&mutex);
+std::cout << "left_cur: " << left_cur << "\nright_cur: " << right_cur
+	<< "\ndelta left: " << left_cur - left_start
+	<< "\ndelta right: " << right_cur - right_start << std::endl;
 		usleep(1000000 / hz);
 	}
 
