@@ -11,7 +11,10 @@ static const float METERS_PER_TICK = 0.00020944; // meters per tick of encoder
 //maebot driving stuff
 const static float GO = 0.4;
 const static float STOP = 0.0;
-const static float TURN_SCALE = 0.6;
+const static float TURN_SPEED_SCALE = 0.6;
+const static float TURN_ANGLE_SCALE = 0.8;
+const static float KP = 1.0;
+const static float KD = 1.95;
 
 //directions
 const static float RIGHT = 0.0;

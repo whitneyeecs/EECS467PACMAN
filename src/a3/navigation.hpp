@@ -20,11 +20,15 @@ private:
 
 	maebot_motor_feedback_t odo;
 
+	int32_t sensors[3];
+
 	lcm::LCM lcm;
 
 	pthread_mutex_t mutex;
 
 	float pose[3];
+
+	bool driving;
 public:
 	Navigation();
 
@@ -33,6 +37,8 @@ public:
 	void go(float dir);
 
 	void stop();
+	
+	void handle();
 
 private:
 	void handle_feedback(const lcm::ReceiveBuffer* rbuf,
@@ -48,6 +54,8 @@ private:
 							const maebot_laser_scan_t* msg);
 	
 	void turn(float angle, float end_dir);
+
+	void correct();
 
 }; // end class
 

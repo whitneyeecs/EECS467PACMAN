@@ -49,7 +49,7 @@ struct state {
     vx_mouse_event_t    last_mouse_event;
 
     // threads
-    pthread_t animate_thread;
+    pthread_t odo_thread;
 	pthread_t command_thread;
 
     // for accessing the arrays
@@ -103,36 +103,13 @@ void* command_thread(void* arg){
 }
 
 void *
-animate_thread (void *data)
+odo_thread (void *data)
 {
-    const int fps = 1;
     state_t *state = (state_t*)data;
 
-    // Continue running until we are signaled otherwise. This happens
-    // when the window is closed/Ctrl+C is received.
-    while (state->running) {
-		//ready to mask
-break;
-	//draw the image
-	vx_object_t *vim = vxo_image_from_u32(&state->image,
-               VXO_IMAGE_FLIPY, VX_TEX_MIN_FILTER | VX_TEX_MAG_FILTER);
-
-	//render the image centered at the origin and 
-	//at a normalized scale of +/-1 unit in x-dir
-	const double scale = 2./state->image.width;
-	vx_buffer_add_back (vx_world_get_buffer (state->vxworld, "image"),
-                            vxo_chain (vxo_mat_scale3 (scale, scale, 1.0),
-                      		      vxo_mat_translate3 
-				      (-state->image.width/2., -state->image.height/2., 0.),
-                                       vim)
-			     );
-	vx_buffer_swap (vx_world_get_buffer (state->vxworld, "image"));
-	fflush (stdout);
-
-
-        usleep (1000000/fps);
-    }
-
+	while(state->running){
+		state->nav->handle();
+	}
 
     return NULL;
 }
@@ -240,7 +217,7 @@ main (int argc, char *argv[])
     state->pg = pg_create ();
 
     // Launch our worker threads
-    pthread_create (&state->animate_thread, NULL, animate_thread, state);
+    pthread_create (&state->odo_thread, NULL, odo_thread, state);
     pthread_create (&state->command_thread, NULL, command_thread, state);
 
     // This is the main loop
@@ -248,7 +225,8 @@ main (int argc, char *argv[])
 
     // Quit when GTK closes
     state->running = 0;
-    pthread_join (state->animate_thread, NULL);
+    pthread_join (state->odo_thread, NULL);
+    pthread_join (state->command_thread, NULL);
 
     // Cleanup
     state_destroy (state);
