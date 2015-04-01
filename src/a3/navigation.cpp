@@ -2,7 +2,11 @@
 #include <iostream>
 
 Navigation::Navigation():
-	pose({0.0, 0.0, RIGHT})
+	sensors {0, 0, 0},
+	pose{0.0, 0.0, RIGHT},
+	driving(false),
+	error(0),
+	prev_error(0)
 	{
 		if(!lcm.good()){
 			std::cout << "error initializing LCM !!!" << std::endl;
@@ -27,16 +31,12 @@ Navigation::Navigation():
 
 
 
-
 void Navigation::handle_feedback(const lcm::ReceiveBuffer* rbuf,
                      const std::string& chan,
                      const maebot_motor_feedback_t* msg){
 	pthread_mutex_lock(&mutex);
 	odo = *msg;
 	pthread_mutex_unlock(&mutex);
-//std::cout << "\nGot Motor Feedback" << std::endl;
-//std::cout << "left odo: " << msg->encoder_left_ticks
-//	<< "\nright odo: " << msg->encoder_right_ticks << std::endl;
 	return;
 }
 
@@ -101,7 +101,8 @@ void Navigation::publish(){
 
 
 void Navigation::correct(){
-
+	//right sensor minus left sensor
+	
 }
 
 
@@ -162,12 +163,13 @@ void Navigation::turn(float angle, float end_dir){
 	left_start = left_cur = odo.encoder_left_ticks;
 	right_start = right_cur = odo.encoder_right_ticks;
 	pthread_mutex_unlock(&mutex);
-//std::cout << "left start: " << left_start
-//	<< "\nleft cur: " << left_cur
-//	<< "\nright start: " <<right_start
-//	<< "\nright cur: " << right_cur << std::endl;
 	float arc_len = CIRC * (angle / (2 * M_PI));
-	int32_t delta_ticks = TURN_ANGLE_SCALE * arc_len / METERS_PER_TICK;
+	int32_t delta_ticks = 0;
+	if(arc_len > 4*M_PI/5){
+		delta_ticks = TURN_ANGLE_SCALE * arc_len / METERS_PER_TICK;
+	}else{
+		delta_ticks = 0.8 * TURN_ANGLE_SCALE * arc_len / METERS_PER_TICK;
+	}
 	delta_ticks = abs(delta_ticks);
 
 	int sign = 0;
@@ -184,19 +186,35 @@ std::cout << "arc lenght: " << arc_len << "\ndelta ticks: " << delta_ticks <<std
 	cmd.motor_right_speed = GO * TURN_SPEED_SCALE * sign;
 	cmd.utime = utime_now();
 	pthread_mutex_unlock(&mutex);
-//std::cout << "arc lenght: " << arc_len << "\ndelta ticks: " << delta_ticks <<std::endl;	
+	
 	int hz = 1000;
-	while(abs(right_cur - right_start) < delta_ticks && 
-			abs(left_cur - left_start) < delta_ticks){
+	while(abs(right_cur - right_start) < delta_ticks -100 && 
+			abs(left_cur - left_start) < delta_ticks - 100){
+		
 		pthread_mutex_lock(&mutex);
 		left_cur = odo.encoder_left_ticks;
 		right_cur = odo.encoder_right_ticks;
 		pthread_mutex_unlock(&mutex);
-//std::cout << "left_cur: " << left_cur << "\nright_cur: " << right_cur
-//	<< "\ndelta left: " << left_cur - left_start
-//	<< "\ndelta right: " << right_cur - right_start << std::endl;
 		usleep(1000000 / hz);
 	}
+
+	float scale;
+	while(abs(right_cur - right_start) < delta_ticks && 
+			abs(left_cur - left_start) < delta_ticks){
+		
+		pthread_mutex_lock(&mutex);
+		left_cur = odo.encoder_left_ticks;
+		right_cur = odo.encoder_right_ticks;
+		scale = delta_ticks - abs(right_cur - right_start);
+		cmd.motor_left_speed = GO * TURN_SPEED_SCALE * -sign;// - 0.2 * (100 - scale) / 100.0;
+		cmd.motor_right_speed = GO * TURN_SPEED_SCALE * sign;// - 0.2 * (100 - scale) / 100.0;
+		cmd.utime = utime_now();
+		
+		pthread_mutex_unlock(&mutex);
+		usleep(1000000 / hz);
+	}
+
+	
 
 	stop();
 

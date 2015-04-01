@@ -39,6 +39,10 @@ private:
 
 	//set true when driving forward, false when stopped
 	bool driving;
+
+	//some things for line following control
+	int32_t error;
+	int32_t prev_error;
 public:
 	Navigation();
 
