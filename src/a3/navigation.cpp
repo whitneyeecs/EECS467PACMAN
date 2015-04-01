@@ -23,6 +23,11 @@ Navigation::Navigation():
 		
 	}
 
+
+
+
+
+
 void Navigation::handle_feedback(const lcm::ReceiveBuffer* rbuf,
                      const std::string& chan,
                      const maebot_motor_feedback_t* msg){
@@ -34,6 +39,12 @@ void Navigation::handle_feedback(const lcm::ReceiveBuffer* rbuf,
 //	<< "\nright odo: " << msg->encoder_right_ticks << std::endl;
 	return;
 }
+
+
+
+
+
+
                                
 void Navigation::handle_sensor(const lcm::ReceiveBuffer* rbuf,
                    const std::string& chan,
@@ -47,15 +58,33 @@ void Navigation::handle_sensor(const lcm::ReceiveBuffer* rbuf,
 	return;
 }
 
+
+
+
+
+
+
 void Navigation::handle_laser(const lcm::ReceiveBuffer* rbuf,
                   const std::string& chan,
                   const maebot_laser_scan_t* msg){
 	return;
 }
 
+
+
+
+
+
+
 void Navigation::handle(){
 	lcm.handle();
 }
+
+
+
+
+
+
 
 void Navigation::publish(){
 	pthread_mutex_lock(&mutex);
@@ -65,9 +94,21 @@ void Navigation::publish(){
 	return;
 }
 
+
+
+
+
+
+
 void Navigation::correct(){
 
 }
+
+
+
+
+
+
 
 void Navigation::go(float dir){
 	float cur_dir = 0.0;
@@ -89,6 +130,12 @@ void Navigation::go(float dir){
 	}
 }
 
+
+
+
+
+
+
 void Navigation::stop(){
 	pthread_mutex_lock(&mutex);
 	cmd.motor_left_speed = STOP;
@@ -97,6 +144,12 @@ void Navigation::stop(){
 	driving = false;
 	pthread_mutex_unlock(&mutex);
 }
+
+
+
+
+
+
 
 void Navigation::turn(float angle, float end_dir){
 	
