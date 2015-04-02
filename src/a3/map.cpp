@@ -4,39 +4,27 @@ Map::Map() { }
 
 vector <Map::Node> Map::initilizeEasy() { 
 
-	vector <Node> map (NUM_NODES_EASY);
-
-	Node n;
-	int i = 0;
-
-	//node 0
-	n.nodeNum = 0;
-	n.right = 0;
-	n.left = 0;
-	n.front = 0;
-	n.behind = 0;
-
-	map[i] = n;
-	i++;
-
-	//node 1
+	vector <Node> maptmp (NUM_NODES_EASY);
 	
-
-	return map;
+	return maptmp;
 }
  
-vector <Map::Node> Map::initilizeMed() { 
+vector <Map::Node> Map::initilizeNorm() { 
+	
+	vector <Node> maptmp (NUM_NODES_NORM);
 
-	vector <Node> map (NUM_NODES_MED);
-
-	return map;
-
+	return maptmp;
+	
 }
 
-vector <Map::Node> Map::initilizeHard() { 
-	
-	vector <Node> map (NUM_NODES_HARD);
+void Map::getMap(char mapType) {
 
-	return map;
-	
+	if (mapType == 'e')
+		map = initilizeEasy();
+	else if (mapType == 'n')
+		map = initilizeNorm();
+	else {
+		cout << "Invalid map type." << endl;
+		exit(1);
+	}
 }

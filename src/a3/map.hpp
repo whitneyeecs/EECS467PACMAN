@@ -8,6 +8,7 @@
 
 #include "Constants.hpp"
 
+#include <iostream>
 #include <vector>
 
 using namespace std;
@@ -29,8 +30,9 @@ public:
 		int behind;
 	};
 
-	Map();
+	vector <Node> map;
 
+	Map();
 
 	/*
 	returns a vector that represents the map, easy version
@@ -38,14 +40,14 @@ public:
 	vector <Map::Node> initilizeEasy();
 
 	/*
-	returns a vector that represents the map, medium version
+	returns a vector that represents the map, normal pacman version
 	*/
-	vector <Map::Node> initilizeMed();
+	vector <Map::Node> initilizeNorm();
 
 	/*
-	returns a vector that represents the map, hard version
+	initilizes map based on requested type of map
 	*/
-	vector <Map::Node> initilizeHard();
+	void getMap(char mapType);
 
 };
 
