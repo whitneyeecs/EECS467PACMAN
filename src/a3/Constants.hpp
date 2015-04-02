@@ -22,5 +22,10 @@ const static float LEFT = M_PI;
 const static float UP = M_PI / 2.0;
 const static float DOWN = -M_PI / 2.0;
 
+//map stuff
+const static int NUM_NODES_EASY = 5;
+const static int NUM_NODES_MED = 10;
+const static int NUM_NODES_HARD = 15; 
+
 
 #endif

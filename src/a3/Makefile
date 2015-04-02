@@ -8,8 +8,7 @@ LDFLAGS = $(LDFLAGS_STD)
 LIBDEPS = $(call libdeps, $(LDFLAGS))
 
 LIB_A3 = $(LIB_PATH)/liba3.a
-LIB_A3_OBJS = navigation.o \
-			 # Node.o \
+LIB_A3_OBJS = navigation.o map.o \
 
 ALL = $(LIB_A3)
 
