@@ -35,6 +35,9 @@ void Navigation::handle_feedback(const lcm::ReceiveBuffer* rbuf,
                      const std::string& chan,
                      const maebot_motor_feedback_t* msg){
 	pthread_mutex_lock(&mutex);
+	int64_t old_time = odo.utime;
+	float hz = 1000000.0 / (float)(msg->utime - old_time);
+	std::cout << hz << std::endl;
 	odo = *msg;
 	pthread_mutex_unlock(&mutex);
 	return;
@@ -164,13 +167,9 @@ void Navigation::turn(float angle, float end_dir){
 	right_start = right_cur = odo.encoder_right_ticks;
 	pthread_mutex_unlock(&mutex);
 	float arc_len = CIRC * (angle / (2 * M_PI));
-	int32_t delta_ticks = 0;
-	if(arc_len > 4*M_PI/5){
-		delta_ticks = TURN_ANGLE_SCALE * arc_len / METERS_PER_TICK;
-	}else{
-		delta_ticks = 0.8 * TURN_ANGLE_SCALE * arc_len / METERS_PER_TICK;
-	}
+	int32_t delta_ticks = arc_len / METERS_PER_TICK;
 	delta_ticks = abs(delta_ticks);
+
 
 	int sign = 0;
 
@@ -188,29 +187,30 @@ std::cout << "arc lenght: " << arc_len << "\ndelta ticks: " << delta_ticks <<std
 	pthread_mutex_unlock(&mutex);
 	
 	int hz = 1000;
-	while(abs(right_cur - right_start) < delta_ticks -100 && 
-			abs(left_cur - left_start) < delta_ticks - 100){
+	while(abs(right_cur - right_start) < delta_ticks ||
+		abs(left_cur - left_start) < delta_ticks){
 		
 		pthread_mutex_lock(&mutex);
 		left_cur = odo.encoder_left_ticks;
 		right_cur = odo.encoder_right_ticks;
 		pthread_mutex_unlock(&mutex);
-		usleep(1000000 / hz);
-	}
+		
+		if(abs(right_cur - right_start) >= delta_ticks){
+			pthread_mutex_lock(&mutex);
+			cmd.motor_right_speed = STOP;
+			cmd.utime = utime_now();
+			pthread_mutex_unlock(&mutex);
+			
+		}
+		if(abs(left_cur - left_start) >= delta_ticks){
+			pthread_mutex_lock(&mutex);
+			cmd.motor_left_speed = STOP;
+			cmd.utime = utime_now();
+			pthread_mutex_unlock(&mutex);
+			
+		}
 
-	float scale;
-	while(abs(right_cur - right_start) < delta_ticks && 
-			abs(left_cur - left_start) < delta_ticks){
-		
-		pthread_mutex_lock(&mutex);
-		left_cur = odo.encoder_left_ticks;
-		right_cur = odo.encoder_right_ticks;
-		scale = delta_ticks - abs(right_cur - right_start);
-		cmd.motor_left_speed = GO * TURN_SPEED_SCALE * -sign;// - 0.2 * (100 - scale) / 100.0;
-		cmd.motor_right_speed = GO * TURN_SPEED_SCALE * sign;// - 0.2 * (100 - scale) / 100.0;
-		cmd.utime = utime_now();
-		
-		pthread_mutex_unlock(&mutex);
+
 		usleep(1000000 / hz);
 	}
 

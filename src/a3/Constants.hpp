@@ -12,7 +12,7 @@ static const float METERS_PER_TICK = 0.00020944; // meters per tick of encoder
 const static float GO = 0.4;
 const static float STOP = 0.0;
 const static float TURN_SPEED_SCALE = 0.5;
-const static float TURN_ANGLE_SCALE = 0.65;
+const static float TURN_ANGLE_SCALE = 0.7;
 const static float KP = 1.0;
 const static float KD = 1.95;
 
@@ -26,5 +26,6 @@ const static float DOWN = -M_PI / 2.0;
 const static int NUM_NODES_EASY = 5;
 const static int NUM_NODES_NORM = 60; 
 
-
+//Game driver
+const static float END_PROG = 123.456;
 #endif

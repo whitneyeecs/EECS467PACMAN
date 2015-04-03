@@ -1,0 +1,4 @@
+struct pacman_command_t
+{
+	float command;
+}
