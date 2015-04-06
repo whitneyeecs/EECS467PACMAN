@@ -8,6 +8,10 @@ vector <Map::Node> Map::initilize() {
 	std::ifstream in;
 	in.open ("../../data/pacNodes.txt");
 	
+	char trash;
+	for(int i = 0; i < 7; i++)
+		in >> trash;
+
 	int x;
 
 	while(in.good()) {
