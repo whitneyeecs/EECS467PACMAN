@@ -9,6 +9,7 @@
 #include "Constants.hpp"
 
 #include <iostream>
+#include <fstream>
 #include <vector>
 
 using namespace std;
@@ -17,38 +18,33 @@ class Map {
 
 private:
 
-public:
+public: 
 
 	struct Node {
 
-		maebot_pose_t pose;
-
 		int nodeNum;
-		int right;
+		int xPos;
+		int yPos;
+		int up;
+		int down;
 		int left;
-		int front;
-		int behind;
+		int right;
 	};
 
 	vector <Node> map;
 
 	Map();
+ 
+	/*
+	returns a vector that represents the map
+	*/
+	vector <Map::Node> initilize();
 
 	/*
-	returns a vector that represents the map, easy version
+	initilizes map 
 	*/
-	vector <Map::Node> initilizeEasy();
+	void getMap();
 
-	/*
-	returns a vector that represents the map, normal pacman version
-	*/
-	vector <Map::Node> initilizeNorm();
-
-	/*
-	initilizes map based on requested type of map
-	*/
-	void getMap(char mapType);
-
-};
+}; 
 
 #endif
