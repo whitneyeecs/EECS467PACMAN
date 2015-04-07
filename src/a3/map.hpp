@@ -18,6 +18,11 @@ class Map {
 
 private:
 
+	/*
+	returns a vector that represents the map
+	*/
+	vector <Map::Node> initilize();
+
 public: 
 
 	struct Node {
@@ -33,12 +38,10 @@ public:
 
 	vector <Node> map;
 
+	int heightInCells = 9;
+	int widthInCells = 10;
+
 	Map();
- 
-	/*
-	returns a vector that represents the map
-	*/
-	vector <Map::Node> initilize();
 
 	/*
 	initilizes map 

@@ -16,7 +16,6 @@
 
 //lcm
 #include "lcm/lcm-cpp.hpp"
-#include "lcmtypes/pacman_command_t.hpp"
 #include "lcmtypes/maebot_board_locations_t.hpp"
 
 #include "eecs467_util.h"    // This is where a lot of the internals live

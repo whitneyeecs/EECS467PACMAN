@@ -1,0 +1,11 @@
+struct maebot_board_locations_t
+{
+	int pacmanX;
+	int pacmanY;
+	
+	int smartghostX;
+	int smartghostY;
+
+	int dumbghostX;
+	int dumbghostY;
+}
