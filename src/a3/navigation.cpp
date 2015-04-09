@@ -92,6 +92,7 @@ void Navigation::handle(){
 void Navigation::publish(){
 	pthread_mutex_lock(&mutex);
 	lcm.publish("MAEBOT_MOTOR_COMMAND", &cmd);
+//std::cout << "PUBLISHING" << std::endl;
 	pthread_mutex_unlock(&mutex);
 
 	return;
@@ -121,13 +122,13 @@ void Navigation::correct(){
 			if(correct > 200.0){ std::cout << "bigger" << std::endl; correct = 200.0;}
 			pthread_mutex_lock(&mutex);
 			cmd.motor_left_speed = GO;
-			cmd.motor_right_speed = GO - 0.1 * (correct / 200.0);
+			cmd.motor_right_speed = GO - 0.08 * (correct / 200.0);
 			cmd.utime = utime_now();
 			pthread_mutex_unlock(&mutex);
 		}else{
 			if(correct < -200.0){ std::cout << "smaller" << std::endl; correct = -200.0;}
 			pthread_mutex_lock(&mutex);
-			cmd.motor_left_speed = GO + 0.1 * (correct / 200.0);
+			cmd.motor_left_speed = GO + 0.08 * (correct / 200.0);
 			cmd.motor_right_speed = GO;
 			cmd.utime = utime_now();
 			pthread_mutex_unlock(&mutex);

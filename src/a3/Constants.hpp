@@ -14,7 +14,7 @@ const static float STOP = 0.0;
 const static float TURN_SPEED_SCALE = 0.5;
 const static float TURN_ANGLE_SCALE = 0.8;
 const static float KP = 1.0;
-const static float KD = 1.65;
+const static float KD = 1.85;
 
 //directions
 const static float RIGHT = 0.0;
