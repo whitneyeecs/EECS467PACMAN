@@ -35,10 +35,10 @@ void Navigation::handle_feedback(const lcm::ReceiveBuffer* rbuf,
                      const std::string& chan,
                      const maebot_motor_feedback_t* msg){
 	pthread_mutex_lock(&mutex);
-	int64_t old_time = odo.utime;
+/*	int64_t old_time = odo.utime;
 	float hz = 1000000.0 / (float)(msg->utime - old_time);
 	std::cout << hz << std::endl;
-	odo = *msg;
+*/	odo = *msg;
 	pthread_mutex_unlock(&mutex);
 	return;
 }
@@ -105,6 +105,32 @@ void Navigation::publish(){
 
 void Navigation::correct(){
 	//right sensor minus left sensor
+	int32_t cur_error = 0;
+	int32_t prev_error = 0;
+	float correct = 0.0;
+
+	int hz = 20;
+	while(driving){
+		cur_error = sensors[2] - sensors[0];
+		correct = KP * (float)cur_error + KD * (float)(cur_error - prev_error);
+		prev_error = cur_error;
+		
+		if(correct > 0.0){
+			pthread_mutex_lock(&mutex);
+			cmd.motor_left_speed = GO;
+			cmd.motor_right_speed = GO - 0.2 * (correct / 200.0);
+			cmd.utime = utime_now();
+			pthread_mutex_unlock(&mutex);
+		}else{
+			pthread_mutex_lock(&mutex);
+			cmd.motor_left_speed = GO + 0.2 * (correct / 200.0);
+			cmd.motor_right_speed = GO;
+			cmd.utime = utime_now();
+			pthread_mutex_unlock(&mutex);
+		}
+			usleep(1000000 / hz);
+std::cout << correct / 200.0 << std::endl;
+	}
 	
 }
 
@@ -129,7 +155,7 @@ void Navigation::go(float dir){
 		cmd.utime = utime_now();
 		driving = true;
 		pthread_mutex_unlock(&mutex);
-	}else{
+//	}else{
 		correct();
 	}
 }
@@ -168,7 +194,7 @@ void Navigation::turn(float angle, float end_dir){
 	pthread_mutex_unlock(&mutex);
 	float arc_len = CIRC * (angle / (2 * M_PI));
 	int32_t delta_ticks = arc_len / METERS_PER_TICK;
-	delta_ticks = abs(delta_ticks);
+	delta_ticks = abs(delta_ticks) * TURN_ANGLE_SCALE;
 
 
 	int sign = 0;

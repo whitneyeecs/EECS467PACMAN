@@ -17,12 +17,12 @@
 //lcm
 #include "lcm/lcm-cpp.hpp"
 #include "lcmtypes/pacman_command_t.hpp"
-#include "lcmtypes/maebot_board_locations_t.hpp"
+//#include "lcmtypes/maebot_board_locations_t.hpp"
 
 #include "eecs467_util.h"    // This is where a lot of the internals live
 
 #include "a3/navigation.hpp"
-#include "a3/map.hpp"
+//#include "a3/map.hpp"
 
 typedef struct state state_t;
 struct state {
@@ -40,7 +40,7 @@ struct state {
 	pthread_t command_thread;
 
 	//map
-	Map map;
+//	Map map;
 
     // for accessing the arrays
     pthread_mutex_t mutex;

@@ -1,11 +1,11 @@
 struct maebot_board_locations_t
 {
-	int pacmanX;
-	int pacmanY;
+	int32_t pacmanX;
+	int32_t pacmanY;
 	
-	int smartghostX;
-	int smartghostY;
+	int32_t smartghostX;
+	int32_t smartghostY;
 
-	int dumbghostX;
-	int dumbghostY;
+	int32_t dumbghostX;
+	int32_t dumbghostY;
 }

@@ -33,7 +33,7 @@
 #include "eecs467_util.h"    // This is where a lot of the internals live
 
 #include "a3/navigation.hpp"
-#include "a3/map.hpp"
+//#include "a3/map.hpp"
 
 typedef struct state state_t;
 struct state {
@@ -52,7 +52,7 @@ struct state {
     	vx_mouse_event_t    last_mouse_event;
 
 	//map
-	Map map;
+//	Map map;
 
     	// for accessing the arrays
     	pthread_mutex_t mutex;
