@@ -109,27 +109,31 @@ void Navigation::correct(){
 	int32_t prev_error = 0;
 	float correct = 0.0;
 
-	int hz = 20;
+	int hz = 40;
 	while(driving){
 		cur_error = sensors[2] - sensors[0];
 		correct = KP * (float)cur_error + KD * (float)(cur_error - prev_error);
 		prev_error = cur_error;
+
+		
 		
 		if(correct > 0.0){
+			if(correct > 200.0){ std::cout << "bigger" << std::endl; correct = 200.0;}
 			pthread_mutex_lock(&mutex);
 			cmd.motor_left_speed = GO;
-			cmd.motor_right_speed = GO - 0.2 * (correct / 200.0);
+			cmd.motor_right_speed = GO - 0.1 * (correct / 200.0);
 			cmd.utime = utime_now();
 			pthread_mutex_unlock(&mutex);
 		}else{
+			if(correct < -200.0){ std::cout << "smaller" << std::endl; correct = -200.0;}
 			pthread_mutex_lock(&mutex);
-			cmd.motor_left_speed = GO + 0.2 * (correct / 200.0);
+			cmd.motor_left_speed = GO + 0.1 * (correct / 200.0);
 			cmd.motor_right_speed = GO;
 			cmd.utime = utime_now();
 			pthread_mutex_unlock(&mutex);
 		}
 			usleep(1000000 / hz);
-std::cout << correct / 200.0 << std::endl;
+//std::cout << correct / 200.0 << std::endl;
 	}
 	
 }

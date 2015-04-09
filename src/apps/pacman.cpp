@@ -67,7 +67,7 @@ struct state {
 
 
 void* command_thread(void* arg){
-	int hz = 20;
+	int hz = 40;
 	state_t* state = (state_t*) arg;
 	while(state->running){
 		state->nav->publish();
