@@ -92,7 +92,6 @@ void Navigation::handle(){
 void Navigation::publish(){
 	pthread_mutex_lock(&mutex);
 	lcm.publish("MAEBOT_MOTOR_COMMAND", &cmd);
-//std::cout << "PUBLISHING" << std::endl;
 	pthread_mutex_unlock(&mutex);
 
 	return;
@@ -105,38 +104,38 @@ void Navigation::publish(){
 
 
 void Navigation::correct(){
-	//right sensor minus left sensor
 	int32_t cur_error = 0;
 	int32_t prev_error = 0;
+	int32_t int_error = 0;
 	float correct = 0.0;
 
-	int hz = 40;
+
+	int hz = 50;
 	while(driving){
-		cur_error = sensors[2] - sensors[0];
-		correct = KP * (float)cur_error + KD * (float)(cur_error - prev_error);
+		cur_error = sensors[2] - sensors[0];// - SENSOR_OFFSET_1;
+printf("error:\t%d\n", cur_error);
+		int_error += cur_error;
+		correct = KP * (float)cur_error + KI * (float)int_error + 
+			  KD * (float)(cur_error - prev_error);
 		prev_error = cur_error;
 
 		
 		
 		if(correct > 0.0){
-			if(correct > 200.0){ std::cout << "bigger" << std::endl; correct = 200.0;}
 			pthread_mutex_lock(&mutex);
-			cmd.motor_left_speed = GO;
-			cmd.motor_right_speed = GO - 0.08 * (correct / 200.0);
+			cmd.motor_left_speed = GO + 0.1 * (correct / 200.0);
+			cmd.motor_right_speed = GO * RIGHT_OFFSET_1;// - 0.1 * (correct / 200.0);
 			cmd.utime = utime_now();
 			pthread_mutex_unlock(&mutex);
 		}else{
-			if(correct < -200.0){ std::cout << "smaller" << std::endl; correct = -200.0;}
 			pthread_mutex_lock(&mutex);
-			cmd.motor_left_speed = GO + 0.08 * (correct / 200.0);
-			cmd.motor_right_speed = GO;
+			cmd.motor_left_speed = GO;// + 0.1 * (correct / 200.0);
+			cmd.motor_right_speed = GO * RIGHT_OFFSET_1 - 0.1 * (correct / 200.0);
 			cmd.utime = utime_now();
 			pthread_mutex_unlock(&mutex);
 		}
 			usleep(1000000 / hz);
-//std::cout << correct / 200.0 << std::endl;
 	}
-	
 }
 
 
@@ -156,7 +155,7 @@ void Navigation::go(float dir){
 	if(!driving){
 		pthread_mutex_lock(&mutex);
 		cmd.motor_left_speed = GO;
-		cmd.motor_right_speed = GO;
+		cmd.motor_right_speed = GO * RIGHT_OFFSET_1;
 		cmd.utime = utime_now();
 		driving = true;
 		pthread_mutex_unlock(&mutex);
@@ -213,7 +212,7 @@ std::cout << "arc lenght: " << arc_len << "\ndelta ticks: " << delta_ticks <<std
 
 	pthread_mutex_lock(&mutex);
 	cmd.motor_left_speed = GO * TURN_SPEED_SCALE * -sign;
-	cmd.motor_right_speed = GO * TURN_SPEED_SCALE * sign;
+	cmd.motor_right_speed = GO * RIGHT_OFFSET_1 * TURN_SPEED_SCALE * sign;
 	cmd.utime = utime_now();
 	pthread_mutex_unlock(&mutex);
 	
