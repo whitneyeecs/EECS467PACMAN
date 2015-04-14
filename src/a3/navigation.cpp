@@ -1,10 +1,14 @@
 #include "navigation.hpp"
 #include <iostream>
+#include <math.h>
+
+namespace eecs467{
 
 Navigation::Navigation():
-	sensors {0, 0, 0},
+	//sensors {0, 0, 0},
 	//pose{0.0, 0.0, RIGHT},
 	odo_init(false),
+	sensors {0, 0, 0},
 	driving(false),
 	error(0),
 	prev_error(0)
@@ -48,7 +52,13 @@ void Navigation::handle_feedback(const lcm::ReceiveBuffer* rbuf,
 		int delta_l = msg->encoder_left_ticks - odo.encoder_left_ticks;
 		int delta_r = msg->encoder_right_ticks - odo.encoder_right_ticks;
 
-		float dist = 0.0;
+		float delta_dist = METERS_PER_TICK * (float)(delta_l + delta_r) / 2.0;
+		float delta_theta = METERS_PER_TICK * (float)(delta_r - delta_l) / BASE;
+
+		pose.x += delta_dist * cos(pose.theta + delta_theta);
+		pose.y += delta_dist * sin(pose.theta + delta_theta);
+		pose.theta += delta_theta;
+		pose.utime = msg->utime;
 	}
 	odo = *msg;
 	odo_init = true;
@@ -161,7 +171,7 @@ void Navigation::go(float dir){
 	pthread_mutex_lock(&mutex);
 	cur_dir = pose.theta;//pose[2];
 	pthread_mutex_unlock(&mutex);
-	if(dir != cur_dir){
+	if(abs(dir - cur_dir) > M_PI / 4.0){
 		turn(dir - cur_dir, dir);	
 	}
 	if(!driving){
@@ -187,6 +197,7 @@ void Navigation::stop(){
 	cmd.motor_right_speed = STOP;
 	cmd.utime = utime_now();
 	driving = false;
+std::cout << pose.x << " " << pose.y << " " << pose.theta << std::endl;
 	pthread_mutex_unlock(&mutex);
 }
 
@@ -219,18 +230,17 @@ void Navigation::turn(float angle, float end_dir){
 	}else{
 		sign = 1;
 	}
-//std::cout << "arc lenght: " << arc_len << "\ndelta ticks: " << delta_ticks <<std::endl;	
+std::cout << "arc lenght: " << arc_len << "\ndelta ticks: " << delta_ticks <<std::endl;	
 
+	int hz = 1000;
 	pthread_mutex_lock(&mutex);
 	cmd.motor_left_speed = GO * TURN_SPEED_SCALE * -sign;
 	cmd.motor_right_speed = GO * RIGHT_OFFSET_1 * TURN_SPEED_SCALE * sign;
 	cmd.utime = utime_now();
 	pthread_mutex_unlock(&mutex);
-//std::cout << "left start:\t" << left_start << std::endl;	
-	int hz = 1000;
+	
 	while(abs(right_cur - right_start) < delta_ticks ||
 		abs(left_cur - left_start) < delta_ticks){
-//std::cout << "left cur:\t" << left_cur << std::endl;
 		pthread_mutex_lock(&mutex);
 		left_cur = odo.encoder_left_ticks;
 		right_cur = odo.encoder_right_ticks;
@@ -252,9 +262,9 @@ void Navigation::turn(float angle, float end_dir){
 		}
 
 
-//		usleep(1000000 / hz);
+		usleep(1000000 / hz);
 	}
-
+std::cout << abs(right_cur - right_start) << std::endl;
 	
 
 	stop();
@@ -266,6 +276,6 @@ void Navigation::turn(float angle, float end_dir){
 }
 
 
-
+}// end namespace
 
 

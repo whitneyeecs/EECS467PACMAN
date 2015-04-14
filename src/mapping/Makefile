@@ -5,8 +5,7 @@ LDFLAGS  = $(LDFLAGS_STD)
 LIBDEPS  = $(call libdeps, $(LDFLAGS))
 
 LIB_MAPPING = $(LIB_PATH)/libmapping.a
-LIBMAPPING_OBJS = \
-	occupancy_grid.o
+LIBMAPPING_OBJS = occupancy_grid.o\
 
 all: $(LIB_MAPPING)
 

@@ -1,0 +1,13 @@
+struct maebot_map_data_t
+{
+	int64_t utime;
+
+	maebot_occupancy_grid_t grid;
+	// number of path points
+	// paths in (x, y) pairs in meters
+	int32_t path_num; 
+	float path_x[path_num]; 
+	float path_y[path_num];
+
+	maebot_processed_laser_scan_t scan;
+}

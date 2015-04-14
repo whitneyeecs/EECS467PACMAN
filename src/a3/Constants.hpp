@@ -3,6 +3,8 @@
 
 #include <cmath>
 
+namespace eecs467{
+
 //robot dimension stuff
 static const float CIRC = 0.25132741228; // meters
 static const float BASE = 0.08; // meters
@@ -27,4 +29,7 @@ const static float DOWN = -M_PI / 2.0;
 
 //Game driver
 const static float END_PROG = 123.456;
+
+}
+
 #endif

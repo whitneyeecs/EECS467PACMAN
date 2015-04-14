@@ -73,7 +73,7 @@ $(BIN_PACMAN): pacman.o $(LIB_EECS467) $(LIBDEPS)
 
 $(BIN_GAME): game.o $(LIB_EECS467) $(LIBDEPS)
 	@echo "\t$@"
-	@$(CXX) -o $@ $^ $(LDFLAGS) $(LIB_EECS467)
+	@$(CXX) -o $@ $^ ../mapping/occupancy_grid.o $(LDFLAGS) $(LIB_EECS467) 
 
 $(BIN_BOARDTEST): boardTest.o $(LIB_EECS467) $(LIBDEPS)
 	@echo "\t$@"

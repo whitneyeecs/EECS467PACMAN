@@ -15,6 +15,8 @@
 
 #include "common/timestamp.h"
 
+namespace eecs467{
+
 class Navigation{
 private:	
 	//command to be sent in loop and updated in 
@@ -95,5 +97,6 @@ private:
 
 }; // end class
 
+}// end namespace
 
 #endif

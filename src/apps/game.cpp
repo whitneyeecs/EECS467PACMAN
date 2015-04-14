@@ -29,11 +29,28 @@
 //LCM
 #include "lcm/lcm-cpp.hpp"
 #include "lcmtypes/pacman_command_t.hpp"
+#include <lcmtypes/maebot_occupancy_grid_t.hpp>
+#include <lcmtypes/maebot_motor_feedback_t.hpp>
+#include <lcmtypes/maebot_laser_scan_t.hpp>
+#include <lcmtypes/maebot_pose_t.hpp>
+#include <lcmtypes/maebot_map_data_t.hpp>
+#include <lcmtypes/maebot_sensor_data_t.hpp>
+#include "mapping/occupancy_grid.hpp"
 
 #include "eecs467_util.h"    // This is where a lot of the internals live
+#include "math/point.hpp"
 
 #include "a3/navigation.hpp"
+#include "a3/LaserCorrector.hpp"
+#include "a3/ParticleFilter.hpp"
+#include "a3/Mapper.hpp"
+#include "a3/SlamConstants.hpp"
+#include "a3/RobotConstants.hpp"
+
 //#include "a3/map.hpp"
+
+
+using namespace eecs467;
 
 typedef struct state state_t;
 struct state {
@@ -60,6 +77,11 @@ struct state {
 	//lcm
 	lcm::LCM* lcm;
 	pacman_command_t cmd;
+
+	eecs467::LaserCorrector* laser;
+        eecs467::ParticleFilter* pf;
+        eecs467::Mapper* mapper;
+
 };
 
 static int
@@ -125,12 +147,19 @@ state_create (void)
     state->running = 1;
 
     state->lcm = new lcm::LCM;
+
     
     if(!state->lcm->good()){
 	std::cout << "ERROR INITIALIZING LCM!!!!!" << std::endl;
 	exit(1);
     } 
-    return state;
+
+    state->laser = new LaserCorrector;
+    state->pf = new ParticleFilter;
+    state->mapper = new Mapper;
+
+    
+	return state;
 }
 
 void
@@ -160,8 +189,9 @@ main (int argc, char *argv[])
     eecs467_init (argc, argv);
     state_t *state = state_create ();
 
-	
+	state->pf->pushMap(state->mapper->getGrid());	
 
+std::cout << "MADE IT HEEEEERRRREEEEEE!!!!!!" << std::endl;
     // Parse arguments from the command line, showing the help
     // screen if required
     state->gopt = getopt_create ();
