@@ -11,6 +11,7 @@
 #include <lcmtypes/maebot_motor_command_t.hpp>
 #include <lcmtypes/maebot_sensor_data_t.hpp>
 #include <lcmtypes/maebot_laser_scan_t.hpp>
+#include <lcmtypes/maebot_pose_t.hpp>
 
 #include "common/timestamp.h"
 
@@ -24,6 +25,12 @@ private:
 	//turning
 	maebot_motor_feedback_t odo;
 
+	//is have we recieved first odometry?
+	bool odo_init;
+
+	//pose to be used for localization and control
+	maebot_pose_t pose;
+
 	//line sensors on bottom of MAE-Bot
 	int32_t sensors[3];
 
@@ -35,7 +42,7 @@ private:
 	pthread_mutex_t mutex;
 
 	//robot's pose: X Y THETA
-	float pose[3];
+//	float pose[3];
 
 	//set true when driving forward, false when stopped
 	bool driving;

@@ -8,7 +8,14 @@ LDFLAGS = $(LDFLAGS_STD)
 LIBDEPS = $(call libdeps, $(LDFLAGS))
 
 LIB_A3 = $(LIB_PATH)/liba3.a
-LIB_A3_OBJS = navigation.o #map.o \
+LIB_A3_OBJS = 	navigation.o \
+		ActionModel.o \
+		LaserCorrector.o \
+		Mapper.o \
+		ParticleFilter.o \
+		SensorModel.o \
+		StateEstimator.o \
+		VirtualOdometry.o
 
 ALL = $(LIB_A3)
 

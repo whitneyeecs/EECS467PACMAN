@@ -12,12 +12,12 @@ static const float METERS_PER_TICK = 0.00020944; // meters per tick of encoder
 const static float GO = 0.3;
 const static float RIGHT_OFFSET_1 = 0.9;
 const static float STOP = 0.0;
-const static float TURN_SPEED_SCALE = 0.5;
-const static float TURN_ANGLE_SCALE = 0.8;
-const static float KP = 0.9;
+const static float TURN_SPEED_SCALE = 0.7;
+const static float TURN_ANGLE_SCALE = 0.9;
+const static float KP = 1.5;
 const static float KI = 0.0;
 const static float KD = 0.0;
-const static int SENSOR_OFFSET_1 = 35;
+const static int SENSOR_OFFSET_1 = -30;
 
 //directions
 const static float RIGHT = 0.0;

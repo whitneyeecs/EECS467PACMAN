@@ -55,11 +55,9 @@ struct state {
 			nav->stop();
 		}
 		else if(msg->command == END_PROG){
-			std::cout <<"Should End" << std::endl;
 			running = false;
 		}
 		else{
-			std::cout << "GOT A MESSAGE" << std::endl;
 			nav->go(msg->command);
 		}
 	}
