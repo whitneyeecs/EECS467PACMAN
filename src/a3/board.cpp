@@ -1,90 +1,57 @@
 #include "board.hpp"
 
-Board::Board() { }
-
-void Board::initilize() { 
-	
-	vector < vector <char> > tmp;
+Board::Board() { 
 
 	std::fstream in;
 
-	in.open("../data/boardGrid.txt", std::ifstream::in);
+	in.open("data/boardGrid.txt", std::ifstream::in);
+
+	vector < vector <char> > tmp;
 
 	//initilize Board
 	if(in.good()) {
 
-		char c;
+		board.resize(widthInCells); 
+		for(int x =0; x < widthInCells; ++x){
+			board[x].resize(heightInCells);
+		}
 
-		for(int i = 0; i < widthInCells; i++) {
-			vector <char> row;
-			for(int j = 0; j < heightInCells; j++) {
-				in >> c;
-				row.push_back(c);
-			}
-			tmp.push_back(row);
+		for(int y = heightInCells -1; y > -1; --y) {
+			for(int x = 0; x < widthInCells; ++x) 
+				in >> board[x][y];
 		}
 	}
-
-	board = tmp;
 	
-	in.close();	 
+	in.close();	
 
-	tmp.clear();
+	
 
-	//initilize board for placing the route
-	for(int i = 0; i < widthInCells; i++) {
-			vector <char> row;
-		for(int j = 0; j < heightInCells; j++) {
-			row.push_back(board[i][j]);
-		}
-		tmp.push_back(row);
-	}
-
-	route = tmp;
 }
 
 void Board::printBoard() {
 
-	for(int i = 0; i < widthInCells; i++) {
-		for(int j = 0; j < heightInCells; j++) {
-			cout << board[i][j] << " ";
+	for(int y = heightInCells - 1; y > -1; --y) {
+		for(int x = 0; x < widthInCells; x++) {
+			cout << board[x][y] << " ";
 		}
 		cout << endl;
 	}
 	cout << endl << endl;
 }
 
-void Board::printRoute() {
-
-	for(int i = 0; i < widthInCells; i++) {
-		for(int j = 0; j < heightInCells; j++) {
-			cout << route[i][j] << " ";
-		}
-		cout << endl;
-	}
-
-	cout << endl << endl;
-}
-
-void Board::clearRoute() {
-
-	vector <vector <char> > tmp;
-
-	for(int i = 0; i < widthInCells; i++) {
-		for(int j = 0; j < heightInCells; j++) 
-			route[i][j] = board[i][j];
-	}
-	
-	route = tmp;
+vector < vector <char> > Board::makeRoute() {
 }
 
 stack <char> Board::getPath(eecs467::Point<int>& start, eecs467::Point<int>& end) {
-
-		clearRoute();
 		
+		//clear the last path
 		while(!path.empty())
 			path.pop();
+	
+		//build a temporary board
+		vector < vector <char> > route = board;
 
+		//start queue
 		queue < eecs467::Point<int> > q;
 
 		//initilize and queue start location
@@ -108,31 +75,37 @@ stack <char> Board::getPath(eecs467::Point<int>& start, eecs467::Point<int>& end
 
 			//check adjacent locations, no bias towards waypoints
 
-			current.x--; //up
-			if(pathFinder(q, start, end, current, 'u'))
+			current.y++; //up
+			if(pathFinder(route, q, start, end, current, 'u'))
 				return path;
 				
-			current.x++;
-			current.y++; //right
-			if(pathFinder(q, start, end, current, 'r'))
-				return path;
-
 			current.y--;
-			current.x++; //down
-			if(pathFinder(q, start, end, current, 'd'))
+ 
+			current.x++; //right
+			if(pathFinder(route, q, start, end, current, 'r'))
 				return path;
 
-			current.x--;
-			current.y--; //left
-			if(pathFinder(q, start, end, current, 'l'))
+			current.x--; 
+
+			current.y--; //down
+			if(pathFinder(route, q, start, end, current, 'd'))
 				return path;
+
+			current.y++;
+
+			current.x--; //left
+			if(pathFinder(route, q, start, end, current, 'l'))
+				return path;
+
+			//current.x++;
 		}
 
 		return path;
 }
 
-bool Board::pathFinder(queue < eecs467::Point<int> >& q, eecs467::Point<int>& start, 
-			eecs467::Point<int>& end, eecs467::Point<int>& current, char dir) {
+bool Board::pathFinder(vector < vector <char> >& route, queue < eecs467::Point<int> >&q, 
+			eecs467::Point<int>& start, eecs467::Point<int>& end, 
+				eecs467::Point<int>& current, char dir) {
 
 	//out of bounds
 	if( current.x >= widthInCells || current.x < 0 || current.y >= heightInCells 
@@ -140,68 +113,77 @@ bool Board::pathFinder(queue < eecs467::Point<int> >& q, eecs467::Point<int>& st
 		return false;
 	
 	//invalid move
-	if( route[current.x][current.y] == 'X' || route[current.x][current.y] == 'q')
+	else if( route[current.x][current.y] == 'X' || route[current.x][current.y] == 'q')
 		return false;
 
 	//already been added to the queue
-	if( route[current.x][current.y] == 'u' || route[current.x][current.y] == 'r' ||
+	else if( route[current.x][current.y] == 'u' || route[current.x][current.y] == 'r' ||
 		route[current.x][current.y] == 'd' || route[current.x][current.y] == 'l')
 		return false;
 	
-	//note direction of movement
-	route[current.x][current.y] = dir;
+	else {
+		//note direction of movement
+		route[current.x][current.y] = dir;
 
-	//reached the end point
-	if( (current.x == end.x) && (current.y == end.y) ) {
-		makePath(start, end, current);
-		return true;
-	}
+		//reached the end point
+		if( (current.x == end.x) && (current.y == end.y) ) {
+			makePath(route, start, end, current);
+			cout << "found end" << endl;
+			return true;
+		}
 		
-	//otherwise
-	eecs467::Point<int> que; 
-	que.x = current.x;
-	que.y = current.y;
-	q.push(que);
-
-	return false;
+		//otherwise
+		cout << "coords " << current.x << " " << current.y << endl;
+		eecs467::Point<int> que; 
+		que.x = current.x;
+		que.y = current.y;
+		q.push(que);
+		return false;
+	}
 }
 
-void Board::makePath(eecs467::Point<int>& start, eecs467::Point<int>& end, 
-						eecs467::Point<int>& current) {
+void Board::makePath(vector < vector <char> >& route, eecs467::Point<int>& start, 
+		eecs467::Point<int>& end, eecs467::Point<int>& current) {
+
+	//debugging purposes
+	printRoute(route);
+
+	//Point<int> next;
+	//next.x = current.x;
+	//next.y = current.y;
 
 	current.x = end.x;
 	current.y = end.y;
-	
-	while( (current.x != start.x) && (current.y != start.y) ) {
+
+	while( !(current.x == start.x && current.y == start.y) ) {
+
+		cout << "coords " << current.x << " " << current.y << " " << 
+		route[current.x][current.y] << endl;
 
 		if(route[current.x][current.y] == 'u') {
-			current.x++;
-			route[current.x][current.y] = 'u';
+			current.y--;
 			char dir = 'u';
 			path.push(dir);
 		}
 	
 		else if(route[current.x][current.y] == 'r') {
-			current.y--;
-			route[current.x][current.y] = 'r';
+			current.x--;
 			char dir = 'r';
 			path.push(dir);
 		}
 
 		else if(route[current.x][current.y] == 'd') {
-			current.x--;
-			route[current.x][current.y] = 'd';
+			current.y++;
 			char dir = 'd';
 			path.push(dir);
 		}
 
 		else if(route[current.x][current.y] == 'l') {
-			current.y++;
-			route[current.x][current.y] = 'l';
+			current.x++;
 			char dir = 'l';
 			path.push(dir);
 		}
-
+ 
 		else {
 			cout << "Illegal direction parameter" << endl;
 			exit(1);
@@ -209,3 +191,15 @@ void Board::makePath(eecs467::Point<int>& start, eecs467::Point<int>& end,
 	}
 }	
 
+void Board::printRoute(vector < vector <char> >& route) {
+	
+	cout << endl; 
+
+	for(int y = heightInCells - 1; y > -1; --y) {
+		for(int x = 0; x < widthInCells; x++) {
+			cout << route[x][y] << " ";
+		}
+		cout << endl;
+	}
+	cout << endl << endl;
+}

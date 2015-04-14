@@ -39,10 +39,11 @@ BIN_EECS467_MAEBOT_EXAMPLE = $(BIN_PATH)/eecs467_maebot_example
 BIN_EECS467_MAEBOT_VIDEO_TELOP = $(BIN_PATH)/eecs467_maebot_video_telop
 BIN_PACMAN = $(BIN_PATH)/pacman
 BIN_GAME = $(BIN_PATH)/game
+BIN_BOARDTEST = $(BIN_PATH)/boardTest
 
 ALL = $(LIB_EECS467) $(BIN_EECS467_GUI_EXAMPLE) $(BIN_EECS467_REXARM_EXAMPLE) \
       $(BIN_EECS467_MAEBOT_EXAMPLE) $(BIN_EECS467_MAEBOT_VIDEO_TELOP) \
-	  $(BIN_PACMAN)	$(BIN_GAME)
+	  $(BIN_PACMAN)	$(BIN_GAME) $(BIN_BOARDTEST)
 
 all: $(ALL)
 
@@ -71,6 +72,10 @@ $(BIN_PACMAN): pacman.o $(LIB_EECS467) $(LIBDEPS)
 	@$(CXX) -o $@ $^ $(LDFLAGS) $(LIB_EECS467)
 
 $(BIN_GAME): game.o $(LIB_EECS467) $(LIBDEPS)
+	@echo "\t$@"
+	@$(CXX) -o $@ $^ $(LDFLAGS) $(LIB_EECS467)
+
+$(BIN_BOARDTEST): boardTest.o $(LIB_EECS467) $(LIBDEPS)
 	@echo "\t$@"
 	@$(CXX) -o $@ $^ $(LDFLAGS) $(LIB_EECS467)
 

@@ -15,7 +15,8 @@ LIB_A3_OBJS = 	navigation.o \
 		ParticleFilter.o \
 		SensorModel.o \
 		StateEstimator.o \
-		VirtualOdometry.o
+		VirtualOdometry.o \
+		board.o
 
 ALL = $(LIB_A3)
 

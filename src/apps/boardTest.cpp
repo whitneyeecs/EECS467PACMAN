@@ -7,31 +7,30 @@ using namespace std;
 int main() {
 
 	Board board;
-	
-	board.initilize();
-	
+
 	board.printBoard();
 
 	eecs467::Point<int> a;
 	eecs467::Point<int> b;
 
-	a.x = 0;
-	a.y = 0;
+	cout << " Enter star location x,y" << endl;
+	cin >>	a.x;
+	cin >> a.y;
 
-	b.x = 0;
-	b.y = 5;
+	cout << " Enter end location x,y" << endl;
+	cin >>	b.x;
+	cin >> b.y;
 	
 	stack <char> path = board.getPath(a, b);
 
 	while(!path.empty()){
-		cout << "hello" << endl;
 		char c = path.top();
 		cout << c << ' ';
 		path.pop();
 	}
-
-	board.printRoute();
+	
+	cout << endl;
 
 	return 0;
 
-}
+} 
