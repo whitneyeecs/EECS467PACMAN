@@ -2,6 +2,8 @@
 #include <iostream>
 #include <math.h>
 
+namespace eecs467{
+
 Navigation::Navigation():
 	//sensors {0, 0, 0},
 	//pose{0.0, 0.0, RIGHT},
@@ -274,6 +276,6 @@ std::cout << abs(right_cur - right_start) << std::endl;
 }
 
 
-
+}// end namespace
 
 

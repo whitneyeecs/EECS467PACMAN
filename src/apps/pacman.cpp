@@ -24,6 +24,8 @@
 #include "a3/navigation.hpp"
 //#include "a3/map.hpp"
 
+using namespace eecs467;
+
 typedef struct state state_t;
 struct state {
  
