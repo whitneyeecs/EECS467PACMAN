@@ -11,13 +11,13 @@ Board::Board() {
 	//initilize Board
 	if(in.good()) {
 
-		board.resize(widthInCells); 
-		for(int x =0; x < widthInCells; ++x){
-			board[x].resize(heightInCells);
+		board.resize(width); 
+		for(int x =0; x < width; ++x){
+			board[x].resize(height);
 		}
 
-		for(int y = heightInCells -1; y > -1; --y) {
-			for(int x = 0; x < widthInCells; ++x) 
+		for(int y = height -1; y > -1; --y) {
+			for(int x = 0; x < width; ++x) 
 				in >> board[x][y];
 		}
 	}
@@ -30,8 +30,8 @@ Board::Board() {
 
 void Board::printBoard() {
 
-	for(int y = heightInCells - 1; y > -1; --y) {
-		for(int x = 0; x < widthInCells; x++) {
+	for(int y = height - 1; y > -1; --y) {
+		for(int x = 0; x < width; x++) {
 			cout << board[x][y] << " ";
 		}
 		cout << endl;
@@ -39,8 +39,66 @@ void Board::printBoard() {
 	cout << endl << endl;
 }
 
-vector < vector <char> > Board::makeRoute() {
-}
+eecs467::Point<int> Board::nextWaypoint(eecs467::Point<int> location, char direction){
+
+	eecs467::Point<int> point;
+	point.x = -1;
+	point.y = -1;
+
+	cout << point.x << ' ' << point.y << endl;
+
+	if (direction == 'u') {
+		for(int i = location.y+1; i < height; i++) {
+			if (board[location.x][i] == 'W') {
+				point.x = location.x;
+				point.y = i;
+				return point;
+			}
+			else if (board[location.x][i] == 'X')
+				return point;
+		}
+	}
+
+	if (direction == 'r') {
+		for(int i = location.x+1; i < width; i++) {
+			if (board[i][location.y] == 'W') {
+				point.x = i;
+				point.y = location.y;
+				return point;
+			}
+			else if (board[i][location.y] == 'X') 
+				return point; 
+		}
+	}
+
+	if (direction == 'd') {
+		for(int i = location.y-1; i >= 0; i--) {
+			if (board[location.x][i] == 'W') {
+				point.x = location.x;
+				point.y = i;
+				return point;
+			}
+			else if (board[location.x][i] == 'X') 
+				return point;
+		}
+	}
+
+	if (direction == 'l') {
+		for(int i = location.x-1; i >= 0; i--) {
+			if (board[i][location.y] == 'W') {
+				point.x = i;
+				point.y = location.y;
+				return point;
+			}
+			else if (board[i][location.y] == 'X') 
+				return point;
+		}	
+	}
+
+
+	return point;
+
+} 
 
 stack < eecs467::Point<int> > Board::getPath(eecs467::Point<int>& start, 
 												eecs467::Point<int>& end) {
@@ -50,7 +108,7 @@ stack < eecs467::Point<int> > Board::getPath(eecs467::Point<int>& start,
 			path.pop();
 	
 		//build a temporary board
-		vector < vector <char> > route = board;
+		vector < vector <char> > route = board;  
 
 		//start queue
 		queue < eecs467::Point<int> > q;
@@ -109,7 +167,7 @@ bool Board::pathFinder(vector < vector <char> >& route, queue < eecs467::Point<i
 				eecs467::Point<int>& current, char dir) {
 
 	//out of bounds
-	if( current.x >= widthInCells || current.x < 0 || current.y >= heightInCells 
+	if( current.x >= width || current.x < 0 || current.y >= height 
 		|| current.y < 0) 
 		return false;
 	
@@ -208,8 +266,8 @@ void Board::printRoute(vector < vector <char> >& route) {
 	
 	cout << endl; 
 
-	for(int y = heightInCells - 1; y > -1; --y) {
-		for(int x = 0; x < widthInCells; x++) {
+	for(int y = height - 1; y > -1; --y) {
+		for(int x = 0; x < width; x++) {
 			cout << route[x][y] << " ";
 		}
 		cout << endl;

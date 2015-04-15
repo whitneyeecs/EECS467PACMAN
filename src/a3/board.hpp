@@ -25,15 +25,12 @@ private:
 	void makePath(vector < vector <char> >& route, eecs467::Point<int>& start, 
 		eecs467::Point<int>& end, eecs467::Point<int>& current);
 
-	vector < vector <char> > makeRoute();
-
-	/* prints the steps taken to find a path on the board */
 	void printRoute(vector < vector <char> >& route);
 	
 public: 
  
-	const static int heightInCells = 17;
-	const static int widthInCells = 19;
+	const static int height = 17;
+	const static int width = 19;
 
 	vector < vector <char> > board;
 	 
@@ -42,6 +39,9 @@ public:
  
 	/* prints the Board */
 	void printBoard();
+
+	/* pacman function, takes a direction and returns a waypoint location */
+	eecs467::Point<int> nextWaypoint(eecs467::Point<int> location, char direction); 
 	
 	/* returns a path of directions. 
 		u - up, d - down, l - left, r - right */
