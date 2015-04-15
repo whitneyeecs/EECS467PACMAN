@@ -42,7 +42,8 @@ void Board::printBoard() {
 vector < vector <char> > Board::makeRoute() {
 }
 
-stack <char> Board::getPath(eecs467::Point<int>& start, eecs467::Point<int>& end) {
+stack < eecs467::Point<int> > Board::getPath(eecs467::Point<int>& start, 
+												eecs467::Point<int>& end) {
 		
 		//clear the last path
 		while(!path.empty())
@@ -128,12 +129,12 @@ bool Board::pathFinder(vector < vector <char> >& route, queue < eecs467::Point<i
 		//reached the end point
 		if( (current.x == end.x) && (current.y == end.y) ) {
 			makePath(route, start, end, current);
-			cout << "found end" << endl;
+			cout << "Found End" << endl;
 			return true;
 		}
 		
 		//otherwise
-		cout << "coords " << current.x << " " << current.y << endl;
+		//cout << "coords " << current.x << " " << current.y << endl;
 		eecs467::Point<int> que; 
 		que.x = current.x;
 		que.y = current.y;
@@ -146,42 +147,54 @@ void Board::makePath(vector < vector <char> >& route, eecs467::Point<int>& start
 		eecs467::Point<int>& end, eecs467::Point<int>& current) {
 
 	//debugging purposes
-	printRoute(route);
-
-	//Point<int> next;
-	//next.x = current.x;
-	//next.y = current.y;
+	//printRoute(route);
 
 	current.x = end.x;
 	current.y = end.y;
 
 	while( !(current.x == start.x && current.y == start.y) ) {
 
-		cout << "coords " << current.x << " " << current.y << " " << 
-		route[current.x][current.y] << endl;
+		//cout << "coords " << current.x << " " << current.y << " " << 
+		//route[current.x][current.y] << endl;
 
 		if(route[current.x][current.y] == 'u') {
+			if(board[current.x][current.y] == 'W') {
+				eecs467::Point<int> point;
+				point.x = current.x;
+				point.y = current.y;
+				path.push(point);
+			}
 			current.y--;
-			char dir = 'u';
-			path.push(dir);
 		}
 	
 		else if(route[current.x][current.y] == 'r') {
+			if(board[current.x][current.y] == 'W') {
+				eecs467::Point<int> point;
+				point.x = current.x;
+				point.y = current.y;
+				path.push(point);
+			}
 			current.x--;
-			char dir = 'r';
-			path.push(dir);
 		}
 
 		else if(route[current.x][current.y] == 'd') {
+			if(board[current.x][current.y] == 'W') {
+				eecs467::Point<int> point;
+				point.x = current.x;
+				point.y = current.y;
+				path.push(point);
+			}
 			current.y++;
-			char dir = 'd';
-			path.push(dir);
 		}
 
 		else if(route[current.x][current.y] == 'l') {
+			if(board[current.x][current.y] == 'W') { 
+				eecs467::Point<int> point;
+				point.x = current.x;
+				point.y = current.y;
+				path.push(point);
+			}
 			current.x++;
-			char dir = 'l';
-			path.push(dir);
 		}
  
 		else {

@@ -2,7 +2,7 @@
 #define BOARD_HPP
 
 #include "math/point.hpp"
-
+ 
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -15,8 +15,8 @@ class Board {
 
 private:
 
-	vector < vector <char> > route;
-	stack <char> path;
+	vector < vector <char> > route; 
+	stack < eecs467::Point<int> > path;
 
 	bool pathFinder(vector < vector <char> >& route, queue < eecs467::Point<int> >&q, 
 			eecs467::Point<int>& start, eecs467::Point<int>& end, 
@@ -45,7 +45,8 @@ public:
 	
 	/* returns a path of directions. 
 		u - up, d - down, l - left, r - right */
-	stack <char> getPath(eecs467::Point<int>& start, eecs467::Point<int>& end);
+	stack < eecs467::Point<int> > getPath(eecs467::Point<int>& start, 
+											eecs467::Point<int>& end);
 
 }; 
  
