@@ -71,6 +71,9 @@ struct state {
 	//map
 //	Map map;
 
+	//thread(s?)
+	pthread_t lcm_thread;
+
     	// for accessing the arrays
     	pthread_mutex_t mutex;
 
@@ -82,7 +85,73 @@ struct state {
         eecs467::ParticleFilter* pf;
         eecs467::Mapper* mapper;
 
-};
+	maebot_pose_t pac_pose;
+
+
+
+	void handle_laser(const lcm::ReceiveBuffer* rbuf,
+			const std::string& chan,
+			const maebot_laser_scan_t* msg){
+
+		pthread_mutex_lock(&mutex);
+		if(!pf->processing()){
+			pf->pushScan(*msg);
+		}
+printf("got a laser\n");
+		pthread_mutex_unlock(&mutex);
+	}
+
+	void handle_feedback(const lcm::ReceiveBuffer* rbuf,
+			const std::string& chan,
+			const maebot_motor_feedback_t* msg){
+
+		pthread_mutex_lock(&mutex);
+		pf->pushOdometry(*msg);
+
+		if(pf->readyToInit() && !pf->initialized()){
+			pf->init(msg);
+			printf("initialized particle filter\n");
+			//broadcast pf->getBestPose
+		}
+		
+		if(pf->readyToProcess() && pf->initialized()){
+			//get current pose
+			maebot_pose_t oldPose = pf->getBestPose();
+
+			//process pf
+			pf->process();
+
+			// get pose after a move
+			maebot_pose_t newPose = pf->getBestPose();
+			//broadcast new pose here
+
+			//get corrected laser scans
+			maebot_processed_laser_scan_t processedScans = 
+				laser->processSingleScan(*pf->getScan(), oldPose, newPose);
+
+			//update map
+			mapper->update(processedScans);
+
+			//broadcast map
+			maebot_particle_map_t pfmap;
+			pf->toLCM(pfmap);
+			lcm->publish("MAEBOT_PARTICLE_MAP", &pfmap);
+		}
+		pthread_mutex_unlock(&mutex);
+	}
+
+};//end state
+
+void* lcm_thread(void* arg){
+	
+	int hz = 100;
+	state_t* state = (state_t*) arg;
+	while(state->running){
+		state->lcm->handle();
+		usleep(1000000 / hz);
+	}
+	return NULL;
+}
 
 static int
 key_event (vx_event_handler_t *vxeh, vx_layer_t *vl, vx_key_event_t* key)
@@ -121,6 +190,7 @@ key_event (vx_event_handler_t *vxeh, vx_layer_t *vl, vx_key_event_t* key)
 static int
 mouse_event (vx_event_handler_t *vxeh, vx_layer_t *vl, vx_camera_pos_t *pos, vx_mouse_event_t *mouse)
 {
+
     state_t *state = (state_t*)vxeh->impl;
 
 
@@ -154,12 +224,22 @@ state_create (void)
 	exit(1);
     } 
 
+    state->lcm->subscribe("MAEBOT_LASER_SCAN", 
+			&state::handle_laser, state);
+    
+    state->lcm->subscribe("MAEBOT_MOTOR_FEEDBACK", 
+			&state::handle_feedback, state);
+
     state->laser = new LaserCorrector;
     state->pf = new ParticleFilter;
-    state->mapper = new Mapper;
+    state->mapper = new Mapper(eecs467::gridSeparationSize,
+                eecs467::gridWidthMeters,
+                eecs467::gridHeightMeters,
+                eecs467::gridCellSizeMeters);
 
+    state->pf->pushMap(state->mapper->getGrid());    
     
-	return state;
+    return state;
 }
 
 void
@@ -179,7 +259,10 @@ state_destroy (state_t *state)
         pg_destroy (state->pg);
 
     delete state->lcm;
-    
+    delete state->laser;
+    delete state->pf;
+    delete state->mapper;   
+ 
     free (state);
 }
 
@@ -189,9 +272,6 @@ main (int argc, char *argv[])
     eecs467_init (argc, argv);
     state_t *state = state_create ();
 
-	state->pf->pushMap(state->mapper->getGrid());	
-
-std::cout << "MADE IT HEEEEERRRREEEEEE!!!!!!" << std::endl;
     // Parse arguments from the command line, showing the help
     // screen if required
     state->gopt = getopt_create ();
@@ -234,6 +314,10 @@ std::cout << "MADE IT HEEEEERRRREEEEEE!!!!!!" << std::endl;
         exit (EXIT_SUCCESS);
     }
 
+    // launch lcm thread
+    pthread_create (&state->lcm_thread, NULL, lcm_thread, state);
+
+
     // Initialize this application as a remote display source. This allows
     // you to use remote displays to render your visualization. Also starts up
     // the animation thread, in which a render loop is run to update your display.
@@ -250,6 +334,7 @@ std::cout << "MADE IT HEEEEERRRREEEEEE!!!!!!" << std::endl;
     state->running = 0;
 
     // Cleanup
+    pthread_join(state->lcm_thread, NULL);
     state_destroy (state);
     vx_remote_display_source_destroy (cxn);
     vx_global_destroy ();

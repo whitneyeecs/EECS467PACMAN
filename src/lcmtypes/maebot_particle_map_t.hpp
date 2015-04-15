@@ -11,8 +11,6 @@
 
 #include <vector>
 #include "maebot_occupancy_grid_t.hpp"
-#include "maebot_occupancy_grid_t.hpp"
-#include "maebot_particle_t.hpp"
 
 
 class maebot_particle_map_t
@@ -21,18 +19,6 @@ class maebot_particle_map_t
         int64_t    utime;
 
         maebot_occupancy_grid_t grid;
-
-        maebot_occupancy_grid_t config_space;
-
-        int32_t    num_particles;
-
-        std::vector< maebot_particle_t > particles;
-
-        int32_t    num_path;
-
-        std::vector< float > path_x;
-
-        std::vector< float > path_y;
 
         int32_t    num_lasers;
 
@@ -146,30 +132,6 @@ int maebot_particle_map_t::_encodeNoHash(void *buf, int offset, int maxlen) cons
     tlen = this->grid._encodeNoHash(buf, offset + pos, maxlen - pos);
     if(tlen < 0) return tlen; else pos += tlen;
 
-    tlen = this->config_space._encodeNoHash(buf, offset + pos, maxlen - pos);
-    if(tlen < 0) return tlen; else pos += tlen;
-
-    tlen = __int32_t_encode_array(buf, offset + pos, maxlen - pos, &this->num_particles, 1);
-    if(tlen < 0) return tlen; else pos += tlen;
-
-    for (int a0 = 0; a0 < this->num_particles; a0++) {
-        tlen = this->particles[a0]._encodeNoHash(buf, offset + pos, maxlen - pos);
-        if(tlen < 0) return tlen; else pos += tlen;
-    }
-
-    tlen = __int32_t_encode_array(buf, offset + pos, maxlen - pos, &this->num_path, 1);
-    if(tlen < 0) return tlen; else pos += tlen;
-
-    if(this->num_path > 0) {
-        tlen = __float_encode_array(buf, offset + pos, maxlen - pos, &this->path_x[0], this->num_path);
-        if(tlen < 0) return tlen; else pos += tlen;
-    }
-
-    if(this->num_path > 0) {
-        tlen = __float_encode_array(buf, offset + pos, maxlen - pos, &this->path_y[0], this->num_path);
-        if(tlen < 0) return tlen; else pos += tlen;
-    }
-
     tlen = __int32_t_encode_array(buf, offset + pos, maxlen - pos, &this->num_lasers, 1);
     if(tlen < 0) return tlen; else pos += tlen;
 
@@ -206,33 +168,6 @@ int maebot_particle_map_t::_decodeNoHash(const void *buf, int offset, int maxlen
     tlen = this->grid._decodeNoHash(buf, offset + pos, maxlen - pos);
     if(tlen < 0) return tlen; else pos += tlen;
 
-    tlen = this->config_space._decodeNoHash(buf, offset + pos, maxlen - pos);
-    if(tlen < 0) return tlen; else pos += tlen;
-
-    tlen = __int32_t_decode_array(buf, offset + pos, maxlen - pos, &this->num_particles, 1);
-    if(tlen < 0) return tlen; else pos += tlen;
-
-    this->particles.resize(this->num_particles);
-    for (int a0 = 0; a0 < this->num_particles; a0++) {
-        tlen = this->particles[a0]._decodeNoHash(buf, offset + pos, maxlen - pos);
-        if(tlen < 0) return tlen; else pos += tlen;
-    }
-
-    tlen = __int32_t_decode_array(buf, offset + pos, maxlen - pos, &this->num_path, 1);
-    if(tlen < 0) return tlen; else pos += tlen;
-
-    if(this->num_path) {
-        this->path_x.resize(this->num_path);
-        tlen = __float_decode_array(buf, offset + pos, maxlen - pos, &this->path_x[0], this->num_path);
-        if(tlen < 0) return tlen; else pos += tlen;
-    }
-
-    if(this->num_path) {
-        this->path_y.resize(this->num_path);
-        tlen = __float_decode_array(buf, offset + pos, maxlen - pos, &this->path_y[0], this->num_path);
-        if(tlen < 0) return tlen; else pos += tlen;
-    }
-
     tlen = __int32_t_decode_array(buf, offset + pos, maxlen - pos, &this->num_lasers, 1);
     if(tlen < 0) return tlen; else pos += tlen;
 
@@ -268,14 +203,6 @@ int maebot_particle_map_t::_getEncodedSizeNoHash() const
     int enc_size = 0;
     enc_size += __int64_t_encoded_array_size(NULL, 1);
     enc_size += this->grid._getEncodedSizeNoHash();
-    enc_size += this->config_space._getEncodedSizeNoHash();
-    enc_size += __int32_t_encoded_array_size(NULL, 1);
-    for (int a0 = 0; a0 < this->num_particles; a0++) {
-        enc_size += this->particles[a0]._getEncodedSizeNoHash();
-    }
-    enc_size += __int32_t_encoded_array_size(NULL, 1);
-    enc_size += __float_encoded_array_size(NULL, this->num_path);
-    enc_size += __float_encoded_array_size(NULL, this->num_path);
     enc_size += __int32_t_encoded_array_size(NULL, 1);
     enc_size += __float_encoded_array_size(NULL, this->num_lasers);
     enc_size += __float_encoded_array_size(NULL, this->num_lasers);
@@ -292,10 +219,8 @@ int64_t maebot_particle_map_t::_computeHash(const __lcm_hash_ptr *p)
             return 0;
     const __lcm_hash_ptr cp = { p, (void*)maebot_particle_map_t::getHash };
 
-    int64_t hash = 0x707ee5150a70bbabLL +
-         maebot_occupancy_grid_t::_computeHash(&cp) +
-         maebot_occupancy_grid_t::_computeHash(&cp) +
-         maebot_particle_t::_computeHash(&cp);
+    int64_t hash = 0x7220a3facb969264LL +
+         maebot_occupancy_grid_t::_computeHash(&cp);
 
     return (hash<<1) + ((hash>>63)&1);
 }

@@ -4,14 +4,14 @@ struct maebot_particle_map_t
 	int64_t utime;
 	
 	maebot_occupancy_grid_t grid;
-	maebot_occupancy_grid_t config_space;
+//	maebot_occupancy_grid_t config_space;
 	
-	int32_t num_particles;
-	maebot_particle_t particles[num_particles];
+//	int32_t num_particles;
+//	maebot_particle_t particles[num_particles];
 
-	int32_t num_path;
-	float path_x[num_path];
-	float path_y[num_path];
+//	int32_t num_path;
+//	float path_x[num_path];
+//	float path_y[num_path];
 
 	int32_t num_lasers;
 	float laser_x[num_lasers];

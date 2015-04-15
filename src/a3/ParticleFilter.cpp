@@ -58,9 +58,9 @@ eecs467::ParticleFilter::toLCM(){
 	maebot_particle_map_t msg;
 	msg.utime = _prior.front().pose.utime;
 	msg.grid = _sensorModel.getGrid()->toLCM();
-	msg.num_particles = (int32_t)_prior.size();
-	msg.particles = _prior;
-	msg.num_path = 0;
+//	msg.num_particles = (int32_t)_prior.size();
+//	msg.particles = _prior;
+//	msg.num_path = 0;
 
 	return msg;
 }
@@ -68,8 +68,8 @@ eecs467::ParticleFilter::toLCM(){
 void eecs467::ParticleFilter::toLCM(maebot_particle_map_t& map) {
 	map.utime = _prior.front().pose.utime;
 	map.grid = _sensorModel.getGrid()->toLCM();
-	map.num_particles = (int32_t)_prior.size();
-	map.particles = _prior;
+//	map.num_particles = (int32_t)_prior.size();
+//	map.particles = _prior;
 
 	for (int i = 0; i < _processedLasers.num_ranges; i+=5) {
 		map.laser_x.push_back(_processedLasers.x_pos[i]);
@@ -77,7 +77,7 @@ void eecs467::ParticleFilter::toLCM(maebot_particle_map_t& map) {
 		map.thetas.push_back(_processedLasers.thetas[i]);
 		map.ranges.push_back(_processedLasers.ranges[i]);
 	}
-	map.num_lasers = map.laser_x.size();
+	map.num_lasers = map.laser_x.size(); 
 }
 
 void eecs467::ParticleFilter::process() {

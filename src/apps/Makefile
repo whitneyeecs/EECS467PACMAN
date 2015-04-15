@@ -40,10 +40,12 @@ BIN_EECS467_MAEBOT_VIDEO_TELOP = $(BIN_PATH)/eecs467_maebot_video_telop
 BIN_PACMAN = $(BIN_PATH)/pacman
 BIN_GAME = $(BIN_PATH)/game
 BIN_BOARDTEST = $(BIN_PATH)/boardTest
+BIN_EECS_PARTICLE_GUI = $(BIN_PATH)/particle_gui
 
 ALL = $(LIB_EECS467) $(BIN_EECS467_GUI_EXAMPLE) $(BIN_EECS467_REXARM_EXAMPLE) \
       $(BIN_EECS467_MAEBOT_EXAMPLE) $(BIN_EECS467_MAEBOT_VIDEO_TELOP) \
-	  $(BIN_PACMAN)	$(BIN_GAME) $(BIN_BOARDTEST)
+	  $(BIN_PACMAN)	$(BIN_GAME) $(BIN_BOARDTEST) \
+	$(BIN_EECS_PARTICLE_GUI)
 
 all: $(ALL)
 
@@ -78,6 +80,10 @@ $(BIN_GAME): game.o $(LIB_EECS467) $(LIBDEPS)
 $(BIN_BOARDTEST): boardTest.o $(LIB_EECS467) $(LIBDEPS)
 	@echo "\t$@"
 	@$(CXX) -o $@ $^ $(LDFLAGS) $(LIB_EECS467)
+
+$(BIN_EECS_PARTICLE_GUI): eecs_particle_gui.o $(LIB_EECS467) $(LIBDEPS)
+	@echo "\t$@"
+	@$(CXX) -o $@ $^ ../mapping/occupancy_grid.o $(LDFLAGS) $(LIB_EECS467)
 
 clean:
 	@rm -f *.o *~ *.a

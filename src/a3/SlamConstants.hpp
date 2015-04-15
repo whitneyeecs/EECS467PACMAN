@@ -66,10 +66,10 @@ static const int wallThreshold = 30;
 static const int emptyThreshold = -30;
 
 // grid stuff
-static const float gridWidthMeters = 5;
-static const float gridHeightMeters = 5;
+static const float gridWidthMeters = 5.0;
+static const float gridHeightMeters = 5.0;
 static const float gridCellSizeMeters = 0.05;
-static const float gridSeparationSize = 1; // in cells
+static const float gridSeparationSize = 1.; // in cells
 
 //navigation
 static const float Kp = 0.5;
