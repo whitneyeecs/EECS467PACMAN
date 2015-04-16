@@ -52,7 +52,7 @@ static const float sensorStartOpen = 0;
 static const float sensorStartUnexplored = 0;
 
 static const float sensorMiddleOutOfGrid = 0;
-static const float sensorMiddleWall = 0.5;
+static const float sensorMiddleWall = 1.5;
 static const float sensorMiddleOpen = 0;
 static const float sensorMiddleUnexplored = 0;
 
@@ -66,8 +66,8 @@ static const int wallThreshold = 30;
 static const int emptyThreshold = -30;
 
 // grid stuff
-static const float gridWidthMeters = 5.0;
-static const float gridHeightMeters = 5.0;
+static const float gridWidthMeters = 10.0;
+static const float gridHeightMeters = 10.0;
 static const float gridCellSizeMeters = 0.05;
 static const float gridSeparationSize = 1.; // in cells
 

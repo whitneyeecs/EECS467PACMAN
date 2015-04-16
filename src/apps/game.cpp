@@ -97,7 +97,7 @@ struct state {
 		if(!pf->processing()){
 			pf->pushScan(*msg);
 		}
-printf("got a laser\n");
+//printf("got a laser\n");
 		pthread_mutex_unlock(&mutex);
 	}
 

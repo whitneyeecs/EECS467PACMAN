@@ -48,9 +48,7 @@ class StateHandler {
 public:
 	// drawing stuff
 	eecs467::OccupancyGrid grid;
-	eecs467::OccupancyGrid configSpaceGrid;
 	image_u8_t* im;
-	image_u8_t* configSpaceIm;
 	maebot_pose_t mostProbable;
 	std::vector<float> path;
 	std::vector<float> prob_path;
@@ -106,7 +104,6 @@ public:
 		}
 
 		im = nullptr;
-		configSpaceIm = nullptr;
 
 		lcm.subscribe("MAEBOT_POSE", &StateHandler::handleLcmMessagePose, this);
 
@@ -119,9 +116,6 @@ public:
 			image_u8_destroy(im);
 		}
 
-		if (configSpaceIm != nullptr) {
-			image_u8_destroy(configSpaceIm);
-		}
 	}
 	
 	void handleLcmMessagePose(const lcm::ReceiveBuffer* rbuf,
@@ -152,6 +146,7 @@ public:
 		// assume grid sizes never change
 		if (im == nullptr) {
 			im = image_u8_create(grid.widthInCells(), grid.heightInCells());
+printf("width in cells:\t%d\theight in cells:\t%d\n", grid.widthInCells(), grid.heightInCells());
 		}
 
 		for (unsigned int y = 0; y < grid.heightInCells(); ++y){
