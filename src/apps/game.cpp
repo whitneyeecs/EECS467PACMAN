@@ -29,24 +29,12 @@
 //LCM
 #include "lcm/lcm-cpp.hpp"
 #include "lcmtypes/pacman_command_t.hpp"
-#include <lcmtypes/maebot_occupancy_grid_t.hpp>
-#include <lcmtypes/maebot_motor_feedback_t.hpp>
-#include <lcmtypes/maebot_laser_scan_t.hpp>
-#include <lcmtypes/maebot_pose_t.hpp>
-#include <lcmtypes/maebot_map_data_t.hpp>
-#include <lcmtypes/maebot_sensor_data_t.hpp>
-#include "mapping/occupancy_grid.hpp"
 
 #include "eecs467_util.h"    // This is where a lot of the internals live
 #include "math/point.hpp"
 
-#include "a3/navigation.hpp"
-#include "a3/LaserCorrector.hpp"
-#include "a3/ParticleFilter.hpp"
-#include "a3/Mapper.hpp"
-#include "a3/SlamConstants.hpp"
-#include "a3/RobotConstants.hpp"
-
+#include "a3/Constants.hpp"
+//#include "a3/navigation.hpp"
 //#include "a3/map.hpp"
 
 
@@ -80,65 +68,6 @@ struct state {
 	//lcm
 	lcm::LCM* lcm;
 	pacman_command_t cmd;
-
-	eecs467::LaserCorrector* laser;
-        eecs467::ParticleFilter* pf;
-        eecs467::Mapper* mapper;
-
-	maebot_pose_t pac_pose;
-
-
-
-	void handle_laser(const lcm::ReceiveBuffer* rbuf,
-			const std::string& chan,
-			const maebot_laser_scan_t* msg){
-
-		pthread_mutex_lock(&mutex);
-		if(!pf->processing()){
-			pf->pushScan(*msg);
-		}
-//printf("got a laser\n");
-		pthread_mutex_unlock(&mutex);
-	}
-
-	void handle_feedback(const lcm::ReceiveBuffer* rbuf,
-			const std::string& chan,
-			const maebot_motor_feedback_t* msg){
-
-		pthread_mutex_lock(&mutex);
-		pf->pushOdometry(*msg);
-
-		if(pf->readyToInit() && !pf->initialized()){
-			pf->init(msg);
-			printf("initialized particle filter\n");
-			//broadcast pf->getBestPose
-		}
-		
-		if(pf->readyToProcess() && pf->initialized()){
-			//get current pose
-			maebot_pose_t oldPose = pf->getBestPose();
-
-			//process pf
-			pf->process();
-
-			// get pose after a move
-			maebot_pose_t newPose = pf->getBestPose();
-			//broadcast new pose here
-
-			//get corrected laser scans
-			maebot_processed_laser_scan_t processedScans = 
-				laser->processSingleScan(*pf->getScan(), oldPose, newPose);
-
-			//update map
-			mapper->update(processedScans);
-
-			//broadcast map
-			maebot_particle_map_t pfmap;
-			pf->toLCM(pfmap);
-			lcm->publish("MAEBOT_PARTICLE_MAP", &pfmap);
-		}
-		pthread_mutex_unlock(&mutex);
-	}
 
 };//end state
 
@@ -224,21 +153,6 @@ state_create (void)
 	exit(1);
     } 
 
-    state->lcm->subscribe("MAEBOT_LASER_SCAN", 
-			&state::handle_laser, state);
-    
-    state->lcm->subscribe("MAEBOT_MOTOR_FEEDBACK", 
-			&state::handle_feedback, state);
-
-    state->laser = new LaserCorrector;
-    state->pf = new ParticleFilter;
-    state->mapper = new Mapper(eecs467::gridSeparationSize,
-                eecs467::gridWidthMeters,
-                eecs467::gridHeightMeters,
-                eecs467::gridCellSizeMeters);
-
-    state->pf->pushMap(state->mapper->getGrid());    
-    
     return state;
 }
 
@@ -259,10 +173,6 @@ state_destroy (state_t *state)
         pg_destroy (state->pg);
 
     delete state->lcm;
-    delete state->laser;
-    delete state->pf;
-    delete state->mapper;   
- 
     free (state);
 }
 

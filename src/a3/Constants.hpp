@@ -16,7 +16,7 @@ const static float RIGHT_OFFSET_1 = 0.9;
 const static float STOP = 0.0;
 const static float TURN_SPEED_SCALE = 0.7;
 const static float TURN_ANGLE_SCALE = 0.9;
-const static float KP = 1.5;
+const static float KP = 0.5;
 const static float KI = 0.0;
 const static float KD = 0.0;
 const static int SENSOR_OFFSET_1 = -30;
@@ -29,6 +29,12 @@ const static float DOWN = -M_PI / 2.0;
 
 //Game driver
 const static float END_PROG = 123.456;
+
+//stuff for initializing nav
+const static int PACMAN = 1; // bot 1 is set up to be pacman
+
+const static float TURN_THRESHOLD = M_PI / 10;
+const static float TARGET_RADIUS = 0.1;
 
 }
 

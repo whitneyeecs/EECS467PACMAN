@@ -15,6 +15,10 @@
 
 #include "common/timestamp.h"
 
+#include "math/angle_functions.hpp"
+#include "math/point.hpp"
+#include <cmath>
+
 namespace eecs467{
 
 class Navigation{
@@ -52,8 +56,13 @@ private:
 	//some things for line following control
 	int32_t error;
 	int32_t prev_error;
+
+	//who are you?
+	int player;
+
+	Point<float> cur_dest;
 public:
-	Navigation();
+	Navigation(int player);
 
 	//call this function to publish motor command messages
 	void publish();
@@ -64,12 +73,24 @@ public:
 	//Sets driving to true
 	void go(float dir);
 
+	//this function will hopefully take you from where you are to the 
+	//point that you input
+	void go_to(Point<float> dest);
+
 	//sets motor command 'cmd' values to STOP.
 	//sets driving to false.
 	void stop();
 	
 	//calls lcm.handle(). calls all lcm handlers.
 	void handle();
+
+	//this function returns true if bot is driving
+	//can be used to check when to update autonomous path finding
+	bool is_driving() { return driving; } 
+
+	//pushes pose from lidar localization to correct the running
+	//odometry pose estimate
+	void push_pose(maebot_pose_t laser_pose);
 
 private:
 	//pushes motor feedback to odo
@@ -78,14 +99,6 @@ private:
 							const maebot_motor_feedback_t* msg);
 						        
 	//stores values of line sensor in sensors[]							
-	void handle_sensor(const lcm::ReceiveBuffer* rbuf,
-							const std::string& chan,
-							const maebot_sensor_data_t* msg);
-
-	
-	void handle_laser(const lcm::ReceiveBuffer* rbuf,
-							const std::string& chan,
-							const maebot_laser_scan_t* msg);
 	
 	//turns robot by 'angle' which should always be a multiple
 	//of +- pi/2. stores 'end_dir' into pose[], this is the 
@@ -93,7 +106,7 @@ private:
 	void turn(float angle, float end_dir);
 
 	//PD controller keeps maebot on line using sensors[]
-	void correct();
+	void correct(Point<float> dest);
 
 }; // end class
 
