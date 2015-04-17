@@ -41,11 +41,13 @@ BIN_PACMAN = $(BIN_PATH)/pacman
 BIN_GAME = $(BIN_PATH)/game
 BIN_BOARDTEST = $(BIN_PATH)/boardTest
 BIN_EECS_PARTICLE_GUI = $(BIN_PATH)/particle_gui
+BIN_SMARTGHOST = $(BIN_PATH)/smartGhost
+BIN_DUMBGHOST = $(BIN_PATH)/dumbGhost
 
 ALL = $(LIB_EECS467) $(BIN_EECS467_GUI_EXAMPLE) $(BIN_EECS467_REXARM_EXAMPLE) \
       $(BIN_EECS467_MAEBOT_EXAMPLE) $(BIN_EECS467_MAEBOT_VIDEO_TELOP) \
 	  $(BIN_PACMAN)	$(BIN_GAME) $(BIN_BOARDTEST) \
-	$(BIN_EECS_PARTICLE_GUI)
+	  $(BIN_EECS_PARTICLE_GUI) $(BIN_SMARTGHOST) $(BIN_DUMBGHOST)
 
 all: $(ALL)
 
@@ -82,6 +84,14 @@ $(BIN_BOARDTEST): boardTest.o $(LIB_EECS467) $(LIBDEPS)
 	@$(CXX) -o $@ $^ $(LDFLAGS) $(LIB_EECS467)
 
 $(BIN_EECS_PARTICLE_GUI): eecs_particle_gui.o $(LIB_EECS467) $(LIBDEPS)
+	@echo "\t$@"
+	@$(CXX) -o $@ $^ ../mapping/occupancy_grid.o $(LDFLAGS) $(LIB_EECS467)
+
+$(BIN_SMARTGHOST): smartGhost.o $(LIB_EECS467) $(LIBDEPS)
+	@echo "\t$@"
+	@$(CXX) -o $@ $^ ../mapping/occupancy_grid.o $(LDFLAGS) $(LIB_EECS467)
+
+$(BIN_DUMBGHOST): dumbGhost.o $(LIB_EECS467) $(LIBDEPS)
 	@echo "\t$@"
 	@$(CXX) -o $@ $^ ../mapping/occupancy_grid.o $(LDFLAGS) $(LIB_EECS467)
 
