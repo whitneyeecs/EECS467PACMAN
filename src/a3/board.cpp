@@ -23,9 +23,6 @@ Board::Board() {
 	}
 	
 	in.close();	
-
-	
-
 }
 
 void Board::printBoard() {
@@ -37,6 +34,23 @@ void Board::printBoard() {
 		cout << endl;
 	}
 	cout << endl << endl;
+}
+
+
+eecs467::Point<int> Board::convertToBoardCoords(maebot_pose_t pose) {
+
+	eecs467::Point <int> point;
+	point.x = pose.x/eecs467::boardCellSize;
+	point.y = pose.y/eecs467::boardCellSize;
+	return point;
+}
+
+eecs467::Point <float> Board::convertToGlobalCoords(eecs467::Point<int> p) {
+
+	eecs467::Point <float> point;
+	point.x = p.x*eecs467::boardCellSize;
+	point.y = p.y*eecs467::boardCellSize;
+	return point;
 }
 
 eecs467::Point<int> Board::nextWaypoint(eecs467::Point<int> location, char direction){
@@ -95,9 +109,7 @@ eecs467::Point<int> Board::nextWaypoint(eecs467::Point<int> location, char direc
 		}	
 	}
 
-
 	return point;
-
 } 
 
 stack < eecs467::Point<int> > Board::getPath(eecs467::Point<int>& start, 

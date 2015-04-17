@@ -32,6 +32,11 @@ const static float END_PROG = 123.456;
 
 //stuff for initializing nav
 const static int PACMAN = 1; // bot 1 is set up to be pacman
+const static int DUMBGHOST = 8; //bot 8 is set up to be dumbghost
+const static int SMARTGHOST = -1;
+
+//board
+const static float boardCellSize = 0.1; // meters
 
 const static float TURN_THRESHOLD = M_PI / 6;
 const static float TARGET_RADIUS = 0.07;
