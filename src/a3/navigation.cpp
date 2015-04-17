@@ -105,53 +105,62 @@ void Navigation::publish(){
 
 void Navigation::correct(Point<float> dest){
 printf("entering Correct\n");
-	float cur_error = 0;
-	float prev_error = 0;
-	float int_error = 0;
+	float cur_error = 0.0;
+	float prev_error = -1000.0;
+	float int_error = 0.0;
 	float correct = 0.0;
 
 	int hz = 60;
 	while(driving){
 		Point<float> cur;
+		float cur_theta;
 		pthread_mutex_lock(&mutex);
 		cur.x = pose.x;
 		cur.y = pose.y;
+		cur_theta = pose.theta;
 		pthread_mutex_unlock(&mutex);
 
 		float dist_to_target = distance_between_points(cur, dest);
-printf("cur pose:\t%f\t%f\n", cur.x, cur.y);
-printf("destinat:\t%f\t%f\n", dest.x, dest.y);
+//printf("cur pose:\t%f\t%f\n", cur.x, cur.y);
+//printf("destinat:\t%f\t%f\n", dest.x, dest.y);
 printf("dist to target:\t%f\n", dist_to_target);
 		if(dist_to_target <= eecs467::TARGET_RADIUS){
 			stop();
-			//break;			
+			//break;
+			return;			
 		}
 
 		
-
-		cur_error = atan2(dest.y - cur.y, dest.x - cur.x);
+		
+		float target_angle = atan2(dest.y - cur.y, dest.x - cur.x);
+		cur_error = wrap_to_pi(target_angle - cur_theta);
 
 		if(abs(cur_error) > eecs467::TURN_THRESHOLD){
 			turn(cur_error, 0.0);
+			cur_error = 0.0;
+			prev_error = -1000.0;
+			int_error = 0.0;
+			usleep(3000000);
 		}else{ 
 //printf("error:\t%d\n", cur_error);
 //		if(cur_error > -40 && cur_error < 40) cur_error = 0;
+			if(prev_error == -1000.0) prev_error = cur_error;
 			int_error += cur_error;
 			correct = KP * (float)cur_error + KI * (float)int_error + 
 				  KD * (float)(cur_error - prev_error);
 			prev_error = cur_error;
 	
-printf("correct is:\t%f\n", correct);			
+//printf("correct is:\t%f\n", correct);			
 			
 			if(correct > 0.0){
 				pthread_mutex_lock(&mutex);
 				cmd.motor_left_speed = GO;// + 0.1 * (correct / 200.0);
-				cmd.motor_right_speed = GO * RIGHT_OFFSET_1 - (correct / M_PI);
+				cmd.motor_right_speed = GO * RIGHT_OFFSET_1 + (correct / M_PI);
 				cmd.utime = utime_now();
 				pthread_mutex_unlock(&mutex);
 			}else{
 				pthread_mutex_lock(&mutex);
-				cmd.motor_left_speed = GO + (correct / M_PI);
+				cmd.motor_left_speed = GO - (correct / M_PI);
 				cmd.motor_right_speed = GO * RIGHT_OFFSET_1;// - 0.1 * (correct / 200.0);
 				cmd.utime = utime_now();
 				pthread_mutex_unlock(&mutex);

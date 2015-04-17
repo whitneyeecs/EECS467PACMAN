@@ -31,11 +31,11 @@
 #include "math/point.hpp"
 
 #include "a3/navigation.hpp"
-#include "a3/LaserCorrector.hpp"
-#include "a3/ParticleFilter.hpp"
-#include "a3/Mapper.hpp"
-#include "a3/SlamConstants.hpp"
-#include "a3/RobotConstants.hpp"
+//#include "a3/LaserCorrector.hpp"
+//#include "a3/ParticleFilter.hpp"
+//#include "a3/Mapper.hpp"
+//#include "a3/SlamConstants.hpp"
+//#include "a3/RobotConstants.hpp"
 //#include "a3/map.hpp"
 
 using namespace eecs467;
@@ -64,13 +64,17 @@ struct state {
 
 
 	lcm::LCM* lcm;
-        eecs467::LaserCorrector* laser;
-        eecs467::ParticleFilter* pf;
-        eecs467::Mapper* mapper;
-
-        maebot_pose_t pac_pose;
+//        eecs467::LaserCorrector* laser;
+//        eecs467::ParticleFilter* pf;
+//        eecs467::Mapper* mapper;
 
 
+	void handle_pose(const lcm::ReceiveBuffer* rbuf, 
+				const std::string& chan,
+				const maebot_pose_t* msg){
+
+		nav->push_pose(*msg);
+	}
 
 	void handle_command(const lcm::ReceiveBuffer* rbuf,
 				const std::string& chan, 
@@ -85,7 +89,7 @@ struct state {
 			nav->go(msg->command);
 		}
 	}
-
+/*
 	void handle_laser(const lcm::ReceiveBuffer* rbuf,
                         const std::string& chan,
                         const maebot_laser_scan_t* msg){
@@ -137,10 +141,10 @@ struct state {
                 }
                 pthread_mutex_unlock(&mutex);
         }
-
+*/
 
 };
-
+/*
 void* test_thread(void* arg){
 	state_t* state = (state_t*) arg;
 	Point<float> one (0.0, 1.0);
@@ -154,7 +158,7 @@ void* test_thread(void* arg){
 	return NULL;
 	
 }
-
+*/
 void* command_thread(void* arg){
 	int hz = 50;
 	state_t* state = (state_t*) arg;
@@ -192,8 +196,9 @@ state_create (void)
 	}
 
 	state->lcm->subscribe("PACMAN_COMMAND", &state::handle_command, state);
-    	
-	state->lcm->subscribe("PACMAN_LASER_SCAN",
+    
+	state->lcm->subscribe("PACMAN_POSE", &state::handle_pose, state);	
+/*	state->lcm->subscribe("PACMAN_LASER_SCAN",
                         &state::handle_laser, state);
 
     	state->lcm->subscribe("PACMAN_MOTOR_FEEDBACK",
@@ -207,7 +212,7 @@ state_create (void)
                 eecs467::gridCellSizeMeters);
 
     	state->pf->pushMap(state->mapper->getGrid());
-
+*/
     
     	return state;
 }
@@ -220,9 +225,9 @@ state_destroy (state_t *state)
 
 	delete state->nav;
 	delete state->lcm;
-    	delete state->laser;
-    	delete state->pf;
-    	delete state->mapper;
+//    	delete state->laser;
+ //   	delete state->pf;
+  //  	delete state->mapper;
 
 
 
@@ -241,7 +246,7 @@ main (int argc, char *argv[])
 	// Launch our worker threads
 	pthread_create (&state->odo_thread, NULL, odo_thread, state);
 	pthread_create (&state->command_thread, NULL, command_thread, state);
-	pthread_create (&state->test_thread, NULL, test_thread, state);
+//	pthread_create (&state->test_thread, NULL, test_thread, state);
 
 	while(state->running){
 		state->lcm->handle();

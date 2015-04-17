@@ -155,7 +155,7 @@ printf("width in cells:\t%d\theight in cells:\t%d\n", grid.widthInCells(), grid.
 			}
 		}
 		
-		lasers.clear();
+/*		lasers.clear();
                 for (int i = 0; i < msg->num_lasers; ++i) {
                         lasers.push_back(msg->laser_x[i]);
                         lasers.push_back(msg->laser_y[i]);
@@ -165,10 +165,12 @@ printf("width in cells:\t%d\theight in cells:\t%d\n", grid.widthInCells(), grid.
                         lasers.push_back(msg->laser_y[i] + msg->ranges[i] * sin(msg->thetas[i]));
                         lasers.push_back(0.0f);
                 }
-
+*/
 
 
 		pthread_mutex_unlock(&Mutex);
+		
+		image_u8_write_pnm(im, "MAP.ppm");
 	}
 
 	void launchThreads() {
