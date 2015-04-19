@@ -51,8 +51,9 @@ public:
 	/*converts board coordinates to global coordinates */
 	eecs467::Point <float> convertToGlobalCoords(eecs467::Point<int> p);
 
-	/* pacman function, takes a direction and returns a waypoint location */
-	eecs467::Point<int> nextWaypoint(eecs467::Point<int> location, char direction); 
+	/* pacman function, takes a direction and returns a waypoint location
+	in board coordinates  */
+	eecs467::Point<int> nextWaypoint(eecs467::Point<int> location, float dir); 
 	
 	/* returns a list of waypoints in grid coordinates */
 	stack < eecs467::Point<int> > getPath(eecs467::Point<int>& start, 
