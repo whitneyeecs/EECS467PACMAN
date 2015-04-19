@@ -92,6 +92,13 @@ public:
 	//odometry pose estimate
 	void push_pose(maebot_pose_t laser_pose);
 
+	maebot_pose_t get_pose() {
+		pthread_mutex_lock(&mutex);
+		maebot_pose_t temp = pose;
+		pthread_mutex_unlock(&mutex);
+		return temp;
+	}
+
 private:
 	//pushes motor feedback to odo
 	void handle_feedback(const lcm::ReceiveBuffer* rbuf,

@@ -40,8 +40,8 @@ void Board::printBoard() {
 eecs467::Point<int> Board::convertToBoardCoords(maebot_pose_t pose) {
 
 	eecs467::Point <int> point;
-	point.x = (pose.x - eecs467::boardCellWidth / 2.0)/eecs467::boardCellWidth;
-	point.y = (pose.y - eecs467::boardCellHeight / 2.0)/eecs467::boardCellHeight;
+	point.x = (pose.x + eecs467::boardCellWidth / 2.0)/eecs467::boardCellWidth;
+	point.y = (pose.y + eecs467::boardCellHeight / 2.0)/eecs467::boardCellHeight;
 	return point;
 }
 
