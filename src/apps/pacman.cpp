@@ -80,8 +80,6 @@ struct state {
 			running = false;
 		}
 		else{
-//			nav->go(msg->command);
-printf("pacman got a command at: %d\n", msg->utime);
 			pthread_mutex_lock(&mutex);
 			next_board_pos = board->nextWaypoint(cur_board_pos, msg->command);
 			pthread_mutex_unlock(&mutex);
@@ -92,32 +90,18 @@ printf("pacman got a command at: %d\n", msg->utime);
 
 void* test_thread(void* arg){
 	state_t* state = (state_t*) arg;
-/*	Point<float> one (0.0, 2.0);
-	Point<float> two (1.0, 2.0);
-	Point<float> three (1.0, 0.0);
-	Point<float> four (0.0, 0.0);
-
-	usleep(5000000);	
-	state->nav->go_to(one);
-	while(state->nav->is_driving()){};
-	state->nav->go_to(two);
-	while(state->nav->is_driving()){};
-	state->nav->go_to(three);
-	while(state->nav->is_driving()){};
-	state->nav->go_to(four);
-*/
 	Point<float> dest ( 0.0, 0.0);
 	Point<float> cur (0.0, 0.0);
 	maebot_pose_t pose;
 
-	int hz = 50;
+	int hz = 20;
 	while(1){
 		pthread_mutex_lock(&state->mutex);
 		if(state->next_board_pos.x != -1 && !state->nav->is_driving() 
 				&& state->cur_board_pos != state->next_board_pos){
 			dest = state->board->convertToGlobalCoords(state->next_board_pos);
 
-printf("goint to\nX:\t%d\tY:\t%d\n", state->next_board_pos.x, state->next_board_pos.y);			
+//printf("going to\nX:\t%d\tY:\t%d\n", state->next_board_pos.x, state->next_board_pos.y);			
 			pthread_mutex_unlock(&state->mutex);
 			state->nav->go_to(dest);
 
@@ -129,6 +113,7 @@ printf("goint to\nX:\t%d\tY:\t%d\n", state->next_board_pos.x, state->next_board_
 		
 		pthread_mutex_lock(&state->mutex);
 		state->cur_board_pos = state->board->convertToBoardCoords(pose);
+printf("%f %f, %f %f", state->cur_board_pos.x, state->cur_board_pos.y, state->next_board_pos.x, state->next_board_pos.y);
 		pthread_mutex_unlock(&state->mutex);
 		
 		usleep(1000000 / hz);

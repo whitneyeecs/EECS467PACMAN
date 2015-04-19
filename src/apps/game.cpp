@@ -119,7 +119,7 @@ struct state {
                         maebot_pose_t newPose = pf->getBestPose();
                         //broadcast new pose here
                         pac_pose = newPose;
-			lcm->publish("PACMAN_POSE", &pac_pose);
+						lcm->publish("PACMAN_POSE", &pac_pose);
                        // nav->push_pose(newPose);
 
                         //get corrected laser scans

@@ -59,7 +59,7 @@ eecs467::Point<int> Board::nextWaypoint(eecs467::Point<int> location, float dir)
 	point.x = -1;
 	point.y = -1;
 
-	cout << point.x << ' ' << point.y << endl;
+	//cout << point.x << ' ' << point.y << endl;
 
 	if (dir == eecs467::UP) {
 		for(int i = location.y+1; i < height; i++) {

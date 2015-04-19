@@ -1,12 +1,11 @@
 #include "navigation.hpp"
 #include <iostream>
 #include <math.h>
+#include "common/timestamp.h"
 
 namespace eecs467{
 
 Navigation::Navigation(int player):
-	//sensors {0, 0, 0},
-	//pose{0.0, 0.0, RIGHT},
 	odo_init(false),
 	sensors {0, 0, 0},
 	driving(false),
@@ -43,10 +42,6 @@ void Navigation::handle_feedback(const lcm::ReceiveBuffer* rbuf,
                      const std::string& chan,
                      const maebot_motor_feedback_t* msg){
 	pthread_mutex_lock(&mutex);
-/*	int64_t old_time = odo.utime;
-	float hz = 1000000.0 / (float)(msg->utime - old_time);
-	std::cout << hz << "\t\t" << msg->encoder_left_ticks << std::endl;
-*/	
 	if(odo_init){
 		int delta_l = msg->encoder_left_ticks - odo.encoder_left_ticks;
 		int delta_r = msg->encoder_right_ticks - odo.encoder_right_ticks;
@@ -70,9 +65,12 @@ void Navigation::handle_feedback(const lcm::ReceiveBuffer* rbuf,
 
 
 void Navigation::push_pose(maebot_pose_t laser_pose){
-	pthread_mutex_lock(&mutex);
-	pose = laser_pose;
-	pthread_mutex_unlock(&mutex);
+	if(!driving){
+		pthread_mutex_lock(&mutex);
+		pose = laser_pose;
+		pose.utime = utime_now();
+		pthread_mutex_unlock(&mutex);
+	}
 }
 
 
@@ -104,7 +102,7 @@ void Navigation::publish(){
 
 
 void Navigation::correct(Point<float> dest){
-printf("entering Correct\n");
+//printf("entering Correct\n");
 	float cur_error = 0.0;
 	float prev_error = -1000.0;
 	float int_error = 0.0;
@@ -121,9 +119,6 @@ printf("entering Correct\n");
 		pthread_mutex_unlock(&mutex);
 
 		float dist_to_target = distance_between_points(cur, dest);
-//printf("cur pose:\t%f\t%f\n", cur.x, cur.y);
-//printf("destinat:\t%f\t%f\n", dest.x, dest.y);
-printf("dist to target:\t%f\n", dist_to_target);
 		if(dist_to_target <= eecs467::TARGET_RADIUS){
 			stop();
 			//break;
@@ -142,15 +137,12 @@ printf("dist to target:\t%f\n", dist_to_target);
 			int_error = 0.0;
 			usleep(3000000);
 		}else{ 
-//printf("error:\t%d\n", cur_error);
-//		if(cur_error > -40 && cur_error < 40) cur_error = 0;
 			if(prev_error == -1000.0) prev_error = cur_error;
 			int_error += cur_error;
 			correct = KP * (float)cur_error + KI * (float)int_error + 
 				  KD * (float)(cur_error - prev_error);
 			prev_error = cur_error;
 	
-//printf("correct is:\t%f\n", correct);			
 			
 			if(correct > 0.0){
 				pthread_mutex_lock(&mutex);
@@ -169,45 +161,6 @@ printf("dist to target:\t%f\n", dist_to_target);
 		}
 	}
 
-
-
-
-
-
-
-
-/*	int32_t cur_error = 0;
-	int32_t prev_error = 0;
-	int32_t int_error = 0;
-	float correct = 0.0;
-
-	int hz = 60;
-	while(driving){
-		cur_error = sensors[2] - sensors[0] - SENSOR_OFFSET_1;
-//printf("error:\t%d\n", cur_error);
-//		if(cur_error > -40 && cur_error < 40) cur_error = 0;
-		int_error += cur_error;
-		correct = KP * (float)cur_error + KI * (float)int_error + 
-			  KD * (float)(cur_error - prev_error);
-		prev_error = cur_error;
-
-		
-		
-		if(correct > 0.0){
-			pthread_mutex_lock(&mutex);
-			cmd.motor_left_speed = GO;// + 0.1 * (correct / 200.0);
-			cmd.motor_right_speed = GO * RIGHT_OFFSET_1 - 0.1 * (correct / 200.0);
-			cmd.utime = utime_now();
-			pthread_mutex_unlock(&mutex);
-		}else{
-			pthread_mutex_lock(&mutex);
-			cmd.motor_left_speed = GO + 0.1 * (correct / 200.0);
-			cmd.motor_right_speed = GO * RIGHT_OFFSET_1;// - 0.1 * (correct / 200.0);
-			cmd.utime = utime_now();
-			pthread_mutex_unlock(&mutex);
-		}
-			usleep(1000000 / hz);
-	}*/
 }
 
 
@@ -296,7 +249,6 @@ void Navigation::turn(float angle, float end_dir){
 	}else{
 		sign = 1;
 	}
-std::cout << "arc lenght: " << arc_len << "\ndelta ticks: " << delta_ticks <<std::endl;	
 
 	int hz = 1000;
 	pthread_mutex_lock(&mutex);
@@ -330,15 +282,7 @@ std::cout << "arc lenght: " << arc_len << "\ndelta ticks: " << delta_ticks <<std
 
 		usleep(1000000 / hz);
 	}
-std::cout << abs(right_cur - right_start) << std::endl;
 	
-
-//	stop();
-
-/*	pthread_mutex_lock(&mutex);
-	pose[2] = end_dir;
-	pthread_mutex_unlock(&mutex);
-*/	
 }
 
 
