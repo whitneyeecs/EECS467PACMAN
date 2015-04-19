@@ -53,7 +53,7 @@ eecs467::Point <float> Board::convertToGlobalCoords(eecs467::Point<int> p) {
 	return point;
 }
 
-eecs467::Point<int> Board::nextWaypoint(eecs467::Point<int> location, char direction){
+eecs467::Point<int> Board::nextWaypoint(eecs467::Point<int> location, float dir){
 
 	eecs467::Point<int> point;
 	point.x = -1;
@@ -61,7 +61,7 @@ eecs467::Point<int> Board::nextWaypoint(eecs467::Point<int> location, char direc
 
 	cout << point.x << ' ' << point.y << endl;
 
-	if (direction == 'u') {
+	if (dir == eecs467::UP) {
 		for(int i = location.y+1; i < height; i++) {
 			if (board[location.x][i] == 'W') {
 				point.x = location.x;
@@ -73,7 +73,7 @@ eecs467::Point<int> Board::nextWaypoint(eecs467::Point<int> location, char direc
 		}
 	}
 
-	if (direction == 'r') {
+	if (dir == eecs467::RIGHT) {
 		for(int i = location.x+1; i < width; i++) {
 			if (board[i][location.y] == 'W') {
 				point.x = i;
@@ -85,7 +85,7 @@ eecs467::Point<int> Board::nextWaypoint(eecs467::Point<int> location, char direc
 		}
 	}
 
-	if (direction == 'd') {
+	if (dir == eecs467::DOWN) {
 		for(int i = location.y-1; i >= 0; i--) {
 			if (board[location.x][i] == 'W') {
 				point.x = location.x;
@@ -97,7 +97,7 @@ eecs467::Point<int> Board::nextWaypoint(eecs467::Point<int> location, char direc
 		}
 	}
 
-	if (direction == 'l') {
+	if (dir == eecs467::LEFT) {
 		for(int i = location.x-1; i >= 0; i--) {
 			if (board[i][location.y] == 'W') {
 				point.x = i;
