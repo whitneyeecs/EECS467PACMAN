@@ -1,4 +1,5 @@
 struct pacman_command_t
 {
+		int64_t utime;
 	float command;
 }

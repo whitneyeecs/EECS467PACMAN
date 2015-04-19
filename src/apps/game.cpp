@@ -42,6 +42,8 @@
 #include "a3/SlamConstants.hpp"
 #include "a3/RobotConstants.hpp"
 
+#include "common/timestamp.h"
+
 
 using namespace eecs467;
 
@@ -79,6 +81,8 @@ struct state {
 	pacman_command_t cmd;
 
 	maebot_pose_t pac_pose;
+
+	bool key_down;
 
         void handle_laser(const lcm::ReceiveBuffer* rbuf,
                         const std::string& chan,
@@ -156,6 +160,7 @@ key_event (vx_event_handler_t *vxeh, vx_layer_t *vl, vx_key_event_t* key)
 	float key_pressed = 0.0;
 	
 	if(!key->released){
+			state->key_down = true;
 		if(key->key_code == VX_KEY_UP){
 			std::cout << "PRESSED UP" << std::endl;
 			key_pressed = UP;	
@@ -172,13 +177,18 @@ key_event (vx_event_handler_t *vxeh, vx_layer_t *vl, vx_key_event_t* key)
 			std::cout << "\n\nBYE BYE\n\n" << std::endl;
 			key_pressed = END_PROG;
 		}
+	state->cmd.command = key_pressed;
+	state->cmd.utime = utime_now();
+	state->lcm->publish("PACMAN_COMMAND", &state->cmd);
 	}else{
-			key_pressed = 1.0;	
+			//key_pressed = 1.0;	
+			state->key_down = false;
 	}
 	
-	state->cmd.command = key_pressed;
+/*	state->cmd.command = key_pressed;
+	state->cmd.utime = utime_now();
 	state->lcm->publish("PACMAN_COMMAND", &state->cmd);
-	
+*/	
 	return 0;
 }
 
@@ -210,6 +220,7 @@ state_create (void)
     state->vxapp.impl = eecs467_default_implementation_create (state->vxworld, state->vxeh);
 
     state->running = 1;
+	state->key_down = false;
 
     state->lcm = new lcm::LCM;
 

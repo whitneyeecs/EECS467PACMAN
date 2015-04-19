@@ -14,6 +14,8 @@
 class pacman_command_t
 {
     public:
+        int64_t    utime;
+
         float      command;
 
     public:
@@ -112,6 +114,9 @@ int pacman_command_t::_encodeNoHash(void *buf, int offset, int maxlen) const
 {
     int pos = 0, tlen;
 
+    tlen = __int64_t_encode_array(buf, offset + pos, maxlen - pos, &this->utime, 1);
+    if(tlen < 0) return tlen; else pos += tlen;
+
     tlen = __float_encode_array(buf, offset + pos, maxlen - pos, &this->command, 1);
     if(tlen < 0) return tlen; else pos += tlen;
 
@@ -122,6 +127,9 @@ int pacman_command_t::_decodeNoHash(const void *buf, int offset, int maxlen)
 {
     int pos = 0, tlen;
 
+    tlen = __int64_t_decode_array(buf, offset + pos, maxlen - pos, &this->utime, 1);
+    if(tlen < 0) return tlen; else pos += tlen;
+
     tlen = __float_decode_array(buf, offset + pos, maxlen - pos, &this->command, 1);
     if(tlen < 0) return tlen; else pos += tlen;
 
@@ -131,13 +139,14 @@ int pacman_command_t::_decodeNoHash(const void *buf, int offset, int maxlen)
 int pacman_command_t::_getEncodedSizeNoHash() const
 {
     int enc_size = 0;
+    enc_size += __int64_t_encoded_array_size(NULL, 1);
     enc_size += __float_encoded_array_size(NULL, 1);
     return enc_size;
 }
 
 int64_t pacman_command_t::_computeHash(const __lcm_hash_ptr *)
 {
-    int64_t hash = 0x54142d4b4a7b20c9LL;
+    int64_t hash = 0xcb4fed38c596d47aLL;
     return (hash<<1) + ((hash>>63)&1);
 }
 

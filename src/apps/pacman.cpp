@@ -81,6 +81,7 @@ struct state {
 		}
 		else{
 //			nav->go(msg->command);
+printf("pacman got a command at: %d\n", msg->utime);
 			pthread_mutex_lock(&mutex);
 			next_board_pos = board->nextWaypoint(cur_board_pos, msg->command);
 			pthread_mutex_unlock(&mutex);
@@ -115,6 +116,8 @@ void* test_thread(void* arg){
 		if(state->next_board_pos.x != -1 && !state->nav->is_driving() 
 				&& state->cur_board_pos != state->next_board_pos){
 			dest = state->board->convertToGlobalCoords(state->next_board_pos);
+
+printf("goint to\nX:\t%d\tY:\t%d\n", state->next_board_pos.x, state->next_board_pos.y);			
 			pthread_mutex_unlock(&state->mutex);
 			state->nav->go_to(dest);
 
