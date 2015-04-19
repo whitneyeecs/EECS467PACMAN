@@ -33,8 +33,8 @@ private:
 	
 public: 
  
-	const static int height = 17;
-	const static int width = 19;
+	const static int height = 15;
+	const static int width = 11;
 
 	/* represents the pacman board has a 2d vector: (W)aypoints, (P)ath, (X)nonvalid */
 	vector < vector <char> > board;
