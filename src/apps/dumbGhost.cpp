@@ -176,7 +176,7 @@ main (int argc, char *argv[])
 
 	while(state->running){
 		//state->lcm->handle();
-		state->pose = state->nav->get_pose()
+		state->pose = state->nav->get_pose();
 	}
 
 	pthread_join (state->odo_thread, NULL);
