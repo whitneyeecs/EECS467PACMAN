@@ -13,9 +13,6 @@ Navigation::Navigation(int player):
 	prev_error(0),
 	player(0)
 	{	
-		pose.x = 0.0;
-		pose.y = 0.0;
-		pose.theta = 0.0;		
 
 		if(!lcm.good()){
 			std::cout << "error initializing LCM !!!" << std::endl;
@@ -30,6 +27,18 @@ Navigation::Navigation(int player):
 		if(player == PACMAN){
 			lcm.subscribe("PACMAN_MOTOR_FEEDBACK", 
 						&Navigation::handle_feedback, this);
+			pose.x = 0.0;
+			pose.y = 0.0;
+			pose.theta = 0.0;
+			RIGHT_OFFSET = RIGHT_OFFSET_1;
+
+		}else if(player == SMARTGHOST){
+			lcm.subscribe("SMARTGHOST_MOTOR_FEEDBACK", 
+						&Navigation::handle_feedback, this);
+			pose.x = 0.0;//pose.x = 304.8; 
+			pose.y = 0.0;
+			pose.theta = M_PI;
+			RIGHT_OFFSET = 1.0;
 		}
 	}
 
@@ -147,13 +156,13 @@ void Navigation::correct(Point<float> dest){
 			if(correct > 0.0){
 				pthread_mutex_lock(&mutex);
 				cmd.motor_left_speed = GO;// + 0.1 * (correct / 200.0);
-				cmd.motor_right_speed = GO * RIGHT_OFFSET_1 + (correct / M_PI);
+				cmd.motor_right_speed = GO * RIGHT_OFFSET + (correct / M_PI);
 				cmd.utime = utime_now();
 				pthread_mutex_unlock(&mutex);
 			}else{
 				pthread_mutex_lock(&mutex);
 				cmd.motor_left_speed = GO - (correct / M_PI);
-				cmd.motor_right_speed = GO * RIGHT_OFFSET_1;// - 0.1 * (correct / 200.0);
+				cmd.motor_right_speed = GO * RIGHT_OFFSET;// - 0.1 * (correct / 200.0);
 				cmd.utime = utime_now();
 				pthread_mutex_unlock(&mutex);
 			}
@@ -196,7 +205,7 @@ void Navigation::go(float dir){
 	if(!driving){
 		pthread_mutex_lock(&mutex);
 		cmd.motor_left_speed = GO;
-		cmd.motor_right_speed = GO * RIGHT_OFFSET_1;
+		cmd.motor_right_speed = GO * RIGHT_OFFSET;
 		cmd.utime = utime_now();
 		driving = true;
 		pthread_mutex_unlock(&mutex);
@@ -253,7 +262,7 @@ void Navigation::turn(float angle, float end_dir){
 	int hz = 1000;
 	pthread_mutex_lock(&mutex);
 	cmd.motor_left_speed = GO * TURN_SPEED_SCALE * -sign;
-	cmd.motor_right_speed = GO * RIGHT_OFFSET_1 * TURN_SPEED_SCALE * sign;
+	cmd.motor_right_speed = GO * RIGHT_OFFSET * TURN_SPEED_SCALE * sign;
 	cmd.utime = utime_now();
 	pthread_mutex_unlock(&mutex);
 	
@@ -283,6 +292,16 @@ void Navigation::turn(float angle, float end_dir){
 		usleep(1000000 / hz);
 	}
 	
+}
+
+void Navigation::test(){
+	while(1){
+	pthread_mutex_lock(&mutex);
+	cmd.motor_left_speed = GO;
+	cmd.motor_right_speed = GO * (1.0);
+	cmd.utime = utime_now();
+	pthread_mutex_unlock(&mutex);
+	}
 }
 
 

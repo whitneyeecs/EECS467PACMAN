@@ -112,8 +112,9 @@ void* test_thread(void* arg){
 		pose = state->nav->get_pose();
 		
 		pthread_mutex_lock(&state->mutex);
-		state->cur_board_pos = state->board->convertToBoardCoords(pose);
-printf("%f %f, %f %f", state->cur_board_pos.x, state->cur_board_pos.y, state->next_board_pos.x, state->next_board_pos.y);
+//		state->cur_board_pos = state->board->convertToBoardCoords(pose);
+		state->cur_board_pos = state->next_board_pos;
+//printf("%d %d, %d %d\n", state->cur_board_pos.x, state->cur_board_pos.y, state->next_board_pos.x, state->next_board_pos.y);
 		pthread_mutex_unlock(&state->mutex);
 		
 		usleep(1000000 / hz);

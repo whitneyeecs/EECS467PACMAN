@@ -60,9 +60,13 @@ private:
 	//who are you?
 	int player;
 
+	float RIGHT_OFFSET;
+
 	Point<float> cur_dest;
 public:
 	Navigation(int player);
+
+	void test();
 
 	//call this function to publish motor command messages
 	void publish();

@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
     getopt_add_bool(state->gopt, 'h', "help", 0, "Show this help screen");
     getopt_add_string(state->gopt, 'd', "device", "/dev/ttyO0", "Serial device");
     getopt_add_int(state->gopt, 'b', "baud", "115200", "Baud rate");
-    getopt_add_string(state->gopt, 'c', "channel", "MAEBOT_LASER_SCAN", "LCM channel name");
+    getopt_add_string(state->gopt, 'c', "channel", "PACMAN_LASER_SCAN", "LCM channel name");
 
     if (!getopt_parse(state->gopt, argc, argv, 1) || getopt_get_bool(state->gopt, "help")) {
         printf("Usage: %s [options]\n\n", argv[0]);

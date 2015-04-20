@@ -297,8 +297,8 @@ sama5_state_thread (void *arg)
 
 		shared_state.sensor_data.user_button_pressed = _read_gpio(user_button);
 
-		maebot_motor_feedback_t_publish (lcm, "MAEBOT_MOTOR_FEEDBACK", &shared_state.motor_feedback);
-		maebot_sensor_data_t_publish (lcm, "MAEBOT_SENSOR_DATA", &shared_state.sensor_data);
+		maebot_motor_feedback_t_publish (lcm, "PACMAN_MOTOR_FEEDBACK", &shared_state.motor_feedback);
+//		maebot_sensor_data_t_publish (lcm, "MAEBOT_SENSOR_DATA", &shared_state.sensor_data);
 
 		pthread_mutex_unlock (&statelock);
 	}
@@ -529,15 +529,15 @@ main (int argc, char *argv[])
     pthread_create (&leds_write_thread_pid, NULL, leds_write_thread, NULL);
 
     // Subscribe to LCM Channels
-    maebot_motor_command_t_subscribe (lcm, "MAEBOT_MOTOR_COMMAND", &diff_drive_handler, NULL);
-    printf ("Listening on channel MAEBOT_MOTOR_COMMAND\n");
-
+    maebot_motor_command_t_subscribe (lcm, "PACMAN_MOTOR_COMMAND", &diff_drive_handler, NULL);
+    printf ("Listening on channel PACMAN_MOTOR_COMMAND\n");
+/*
     maebot_leds_command_t_subscribe (lcm, "MAEBOT_LEDS_COMMAND", &leds_handler, NULL);
     printf ("Listening on channel MAEBOT_LEDS_COMMAND\n");
 
     maebot_targeting_laser_command_t_subscribe (lcm, "MAEBOT_TARGETING_LASER_COMMAND", &laser_handler, NULL);
     printf ("Listening on channel MAEBOT_TARGETING_LASER_COMMAND\n");
-
+*/
     // Read state from sama5
 	pthread_t sama5_state_thread_pid;
 	pthread_create (&sama5_state_thread_pid, NULL, sama5_state_thread, NULL);
