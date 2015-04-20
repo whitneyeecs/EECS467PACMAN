@@ -42,8 +42,8 @@ struct state {
 
 	stack < Point<int> > wayPoints; 
 
-    //threads
-    pthread_t odo_thread;
+	//threads
+	pthread_t odo_thread;
 	pthread_t command_thread;
 	pthread_t ai_thread;
 
@@ -155,6 +155,10 @@ main (int argc, char *argv[])
 	pthread_create (&state->odo_thread, NULL, odo_thread, state);
 	pthread_create (&state->command_thread, NULL, command_thread, state);
 	pthread_create (&state->ai_thread, NULL, ai_thread, state);
+
+	state->pose.x = 304.8;
+	state->pose.y = 0.0;
+	state->pose.theta = M_PI;
 
 	while(state->running){
 		state->lcm->handle();

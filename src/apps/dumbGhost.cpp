@@ -44,14 +44,16 @@ struct state {
 	int diffyCount;
 
 	stack < Point<int> > wayPoints; 
-
-    //threads
-    pthread_t odo_thread;
+	
+	Point <int> myLocation;
+    
+	//threads
+    	pthread_t odo_thread;
 	pthread_t command_thread;
 	pthread_t ai_thread;
 
-    // for accessing the arrays
-    pthread_mutex_t mutex;
+    	// for accessing the arrays
+    	pthread_mutex_t mutex;
 
 	lcm::LCM* lcm;
 
@@ -129,7 +131,11 @@ state_create (void)
 	
 	state->diffyCount = 0;
 	state->diffy = 2;
-   	
+
+	state->pose.x = 0.0;
+	state->pose.y = 304.8;
+	state->pose.theta = 0.0;
+
 	state->lcm = new lcm::LCM; 
     	if(!state->lcm->good()){
 		std::cout <<"error initializing LCM !!!" << std::endl;
