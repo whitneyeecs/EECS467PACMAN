@@ -38,7 +38,7 @@ struct state {
 
 	//game stuff
 	Navigation* nav;
-	Board board;
+	Board* board;
  
 	int diffy; // larger the number the easier, the smaller the harder
 	int diffyCount;
@@ -96,14 +96,14 @@ void * ai_thread(void *data)
 	//RANDOM EXPLORE
 	while(!state->nav->is_driving()){
 	
-		Point <int> myLocation = state->board.convertToBoardCoords(state->pose);	
+		Point <int> myLocation = state->board->convertToBoardCoords(state->pose);	
 		
 		if(state->diffyCount > state->diffy || state->wayPoints.empty()) {
 			//get new path
 			Point <int> dest;
-			dest.x = rand() % state->board.width;
-			dest.y = rand() % state->board.height;
-			state->wayPoints = state->board.getPath(myLocation, dest);			
+			dest.x = rand() % state->board->width;
+			dest.y = rand() % state->board->height;
+			state->wayPoints = state->board->getPath(myLocation, dest);			
 			state->diffyCount = 0;
 		}
 		
@@ -112,7 +112,7 @@ void * ai_thread(void *data)
 			point.x = state->wayPoints.top().x;
 			point.y = state->wayPoints.top().y;
 			state->wayPoints.pop();
-			Point <float> dest = state->board.convertToGlobalCoords(point);
+			Point <float> dest = state->board->convertToGlobalCoords(point);
 			state->nav->go_to(dest);			
 			state->diffyCount++;
 		}	
@@ -128,7 +128,7 @@ state_create (void)
 
    	state->running = 1;
 	state->nav = new Navigation(DUMBGHOST);
-	
+	state->board = new Board;
 	state->diffyCount = 0;
 	state->diffy = 2;
 
@@ -154,6 +154,7 @@ state_destroy (state_t *state)
         return;
 
 	delete state->nav;
+	delete state->board;
 
     free (state);
 }
@@ -169,8 +170,13 @@ main (int argc, char *argv[])
 	pthread_create (&state->command_thread, NULL, command_thread, state);
 	pthread_create (&state->ai_thread, NULL, ai_thread, state);
 
+	state->pose.x = 0.0;
+	state->pose.y = 3.048;
+	state->pose.theta = 0.0;
+
 	while(state->running){
-		state->lcm->handle();
+		//state->lcm->handle();
+		state->pose = state->nav->get_pose()
 	}
 
 	pthread_join (state->odo_thread, NULL);

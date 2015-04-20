@@ -39,20 +39,25 @@ struct state {
 	//game stuff
 	Navigation* nav;
 	Board* board;
+ 
+	int diffy; // larger the number the easier, the smaller the harder
+	int diffyCount;
 
 	stack < Point<int> > wayPoints; 
-
+	
+	Point <int> myLocation;
+    
 	//threads
-	pthread_t odo_thread;
+    	pthread_t odo_thread;
 	pthread_t command_thread;
 	pthread_t ai_thread;
 
-    pthread_mutex_t mutex;
+    	// for accessing the arrays
+    	pthread_mutex_t mutex;
 
 	lcm::LCM* lcm;
 
 	maebot_pose_t pose;
-	Point <int> pacmanDest;
 
 	void pose_handler(const lcm::ReceiveBuffer* rbuf, const std::string& chan,
 					   const maebot_pose_t* msg)
@@ -61,12 +66,6 @@ struct state {
 		nav->push_pose(*msg);
 	}
 
-	void pacmanDest_handler(const lcm::ReceiveBuffer* rbuf, 
-								const std::string& chan, const Point <int> *msg)
-	{
-		pacmanDest = *msg;
-	}
-	
 };
 
 void* command_thread(void* arg){
@@ -93,24 +92,32 @@ void * odo_thread (void *data)
 void * ai_thread(void *data)
 {
 	state_t *state = (state_t*)data;
-
-	//THE CHASE!!!
+	
+	//RANDOM EXPLORE
 	while(!state->nav->is_driving()){
-
+	
 		Point <int> myLocation = state->board->convertToBoardCoords(state->pose);	
 		
-		state->wayPoints = state->board->getPath(myLocation, state->pacmanDest);
+		if(state->diffyCount > state->diffy || state->wayPoints.empty()) {
+			//get new path
+			Point <int> dest;
+			dest.x = rand() % state->board->width;
+			dest.y = rand() % state->board->height;
+			state->wayPoints = state->board->getPath(myLocation, dest);			
+			state->diffyCount = 0;
+		}
 		
-		if(!state->wayPoints.empty()) {	
-			Point <int> point;
+		else {
+			Point <float> point;
 			point.x = state->wayPoints.top().x;
 			point.y = state->wayPoints.top().y;
 			state->wayPoints.pop();
-			Point <float> dest = state->board->convertToGlobalCoords(point); 
-			state->nav->go_to(dest);
+			Point <float> dest = state->board->convertToGlobalCoords(point);
+			state->nav->go_to(dest);			
+			state->diffyCount++;
 		}	
 	}
-
+	
 	return NULL;
 }
 
@@ -120,21 +127,22 @@ state_create (void)
    	state_t *state = (state_t*)calloc (1, sizeof(*state));
 
    	state->running = 1;
-	state->nav = new Navigation(SMARTGHOST);
-   	state->board = new Board();
+	state->nav = new Navigation(DUMBGHOST);
+	state->board = new Board;
+	state->diffyCount = 0;
+	state->diffy = 2;
 
-	state->pose.x = 3.048;
-	state->pose.y = 0.0;
-	state->pose.theta = M_PI;
+	state->pose.x = 0.0;
+	state->pose.y = 304.8;
+	state->pose.theta = 0.0;
 
 	state->lcm = new lcm::LCM; 
     	if(!state->lcm->good()){
 		std::cout <<"error initializing LCM !!!" << std::endl;
 		exit(1);
 	}
-    	
-	state->lcm->subscribe("SMARTGHOST_POSE", &state::pose_handler, state);
-    //state->lcm->subscribe("PACMAN_DEST", &state::pacmanDest_handler, state);
+
+	state->lcm->subscribe("DUMBGHOST_POSE", &state::pose_handler, state);    
 
     return state;
 }
@@ -147,6 +155,7 @@ state_destroy (state_t *state)
 
 	delete state->nav;
 	delete state->board;
+
     free (state);
 }
 
@@ -161,9 +170,9 @@ main (int argc, char *argv[])
 	pthread_create (&state->command_thread, NULL, command_thread, state);
 	pthread_create (&state->ai_thread, NULL, ai_thread, state);
 
-	state->pose.x = 304.8;
-	state->pose.y = 0.0;
-	state->pose.theta = M_PI;
+	state->pose.x = 0.0;
+	state->pose.y = 3.048;
+	state->pose.theta = 0.0;
 
 	while(state->running){
 		state->lcm->handle();

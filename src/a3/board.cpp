@@ -120,7 +120,7 @@ stack < eecs467::Point<int> > Board::getPath(eecs467::Point<int>& start,
 			path.pop();
 	
 		//build a temporary board
-		vector < vector <char> > route = board;  
+		vector < vector <char> > route = board;
 
 		//start queue
 		queue < eecs467::Point<int> > q;
@@ -135,7 +135,8 @@ stack < eecs467::Point<int> > Board::getPath(eecs467::Point<int>& start,
 		tmpS.y = start.y;		
 		q.push(tmpS);
 
-		route[start.x][start.y] = 'q';
+		if(start.x > 0 && start.x < width && start.y > 0 && start.y < height)
+			route[start.x][start.y] = 'q';
 
 		while(!q.empty()) {
 
@@ -170,7 +171,6 @@ stack < eecs467::Point<int> > Board::getPath(eecs467::Point<int>& start,
 
 			//current.x++;
 		}
-
 		return path;
 }
 
@@ -195,11 +195,10 @@ bool Board::pathFinder(vector < vector <char> >& route, queue < eecs467::Point<i
 	else {
 		//note direction of movement
 		route[current.x][current.y] = dir;
-
 		//reached the end point
 		if( (current.x == end.x) && (current.y == end.y) ) {
 			makePath(route, start, end, current);
-			cout << "Found End" << endl;
+			//cout << "Found End" << endl;
 			return true;
 		}
 		

@@ -14,34 +14,31 @@ int main() {
 	eecs467::Point<int> b;
 	char dir;
 
-	while(1) {
-
+while(1){
 		cout << "Enter start location x,y" << endl;
 		cin >>	a.x;
 		cin >> a.y;
 
-		cout << "Enter a direction: u, r, l, d" << endl;
-		cin >> dir;
+//		cout << "Enter a direction: u, r, l, d" << endl;
+//		cin >> dir;
 
-		eecs467::Point<int> point = board.nextWaypoint(a, dir); 
+//		eecs467::Point<int> point = board.nextWaypoint(a, dir); 
 
-		cout << "Next Waypoint " << point.x << ' ' << point.y << endl;
+//		cout << "Next Waypoint " << point.x << ' ' << point.y << endl;
  
-	}
  
-/*
 	cout << "Enter end location x,y" << endl;
 	cin >>	b.x;
 	cin >> b.y;
 
-	//stack < eecs467::Point<int> > path = board.getPath(a, b);
+	stack < eecs467::Point<int> > path = board.getPath(a, b);
 
 	while(!path.empty()){
 		eecs467::Point<int> p = path.top();
 		cout << p.x << ' ' << p.y << endl;
 		path.pop();
 	}
-*/
+}
 
 	return 0;
 
